@@ -256,7 +256,7 @@
         const streamUrl = `${FIREBASE_URL}${DB_PATH}?auth=${FIREBASE_AUTH}`;
 
         // State data sensor
-        let sensorData = { suhu: 0, kelembapan: 0, gas: 0, jarak: 0 };
+        let sensorData = { Suhu: 0, Kelembapan: 0, Gas: 0, Jarak: 0 };
         let hasReceivedData = false;
 
         const statusText = document.getElementById('conn-status');
@@ -331,7 +331,7 @@
         // Fungsi evaluasi status sensor
         function updateDashboard() {
             // 1. DHT22 Suhu (0 - 50 °C)
-            const suhu = updateGauge('temp', sensorData.suhu, 0, 50);
+            const suhu = updateGauge('temp', sensorData.Suhu, 0, 50);
             const badgeTemp = document.getElementById('status-temp');
             if (suhu > 35) {
                 badgeTemp.textContent = "Overheat!";
@@ -342,7 +342,7 @@
             }
 
             // 2. DHT22 Kelembapan (0 - 100 %)
-            const hum = updateGauge('hum', sensorData.kelembapan, 0, 100);
+            const hum = updateGauge('hum', sensorData.Kelembapan, 0, 100);
             const badgeHum = document.getElementById('status-hum');
             if (hum > 80) {
                 badgeHum.textContent = "Terlalu Lembap";
@@ -356,7 +356,7 @@
             }
 
             // 3. MQ-2 Gas / Asap (ADC ESP32: 0 - 4095)
-            const gas = updateGauge('gas', sensorData.gas, 0, 4095);
+            const gas = updateGauge('gas', sensorData.Gas, 0, 4095);
             const badgeGas = document.getElementById('status-gas');
             if (gas > 1500) {
                 badgeGas.textContent = "Deteksi Gas / Asap!";
@@ -367,7 +367,7 @@
             }
 
             // 4. HC-SR04 Jarak Rintangan (0 - 200 CM)
-            const jarak = updateGauge('dist', sensorData.jarak, 0, 200);
+            const jarak = updateGauge('dist', sensorData.Jarak, 0, 200);
             const badgeDist = document.getElementById('status-dist');
             if (hasReceivedData && jarak < 15) {
                 badgeDist.textContent = "Awas Tabrakan!";
