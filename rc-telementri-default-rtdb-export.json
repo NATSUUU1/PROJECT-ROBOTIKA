@@ -1,0 +1,14 @@
+{
+  "Sensor": {
+    "Gas": 0,
+    "Jarak": 802,
+    "Kelembapan": 0,
+    "Suhu": 0
+  },
+  "monitoring": {
+    "gas": 225,
+    "jarak": 400,
+    "kelembapan": 51.7,
+    "suhu": 32.2
+  }
+}
