@@ -368,4 +368,457 @@
         .circle-bg {
             fill: none;
             stroke: var(--track-ring);
-            stroke-width:
+            stroke-width: 3.4;
+        }
+
+        .circle {
+            fill: none;
+            stroke-width: 3.4;
+            stroke-linecap: round;
+            transition: stroke-dasharray 0.65s cubic-bezier(0.22, 1, 0.36, 1), stroke 0.35s ease;
+        }
+
+        /* Warna Tropis Tiap Sensor */
+        .color-temp { stroke: #e07a5f; }   /* Terakota Hangat */
+        .color-hum  { stroke: #2a9d8f; }   /* Toska Lagun */
+        .color-gas  { stroke: #40916c; }   /* Hijau Hutan */
+        .color-dist { stroke: #52796f; }   /* Sage Gelap */
+
+        .percentage {
+            fill: var(--leaf-deep);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.46em;
+            text-anchor: middle;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .sensor-label {
+            fill: var(--text-muted);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.19em;
+            text-anchor: middle;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        .scale-range {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 16px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--safe-text);
+            background-color: var(--safe-bg);
+            border: 1px solid rgba(45, 106, 79, 0.18);
+            transition: all 0.3s ease;
+        }
+
+        .status-warning {
+            background-color: var(--warn-bg);
+            color: var(--warn-text);
+            border-color: rgba(217, 119, 6, 0.25);
+        }
+
+        .status-danger {
+            background-color: var(--danger-bg);
+            color: var(--danger-text);
+            border-color: rgba(220, 38, 38, 0.28);
+            animation: pulseAlert 1.1s infinite ease-in-out;
+        }
+
+        @keyframes pulseAlert {
+            0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.3); }
+            50%  { transform: scale(1.04); box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Efek Pencahayaan Matahari Tropis & Partikel Embun -->
+    <div class="sunbeam-glow"></div>
+    <div class="dew-particles" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <!-- Dekorasi Dedaunan Tropis (SVG) -->
+    <div class="foliage-layer" aria-hidden="true">
+        <!-- Daun Palem Tropis Kiri Atas -->
+        <svg class="leaf-decor leaf-top-left" viewBox="0 0 300 300" fill="none">
+            <path d="M10 10 C90 40, 170 110, 230 220" stroke="#1b4332" stroke-width="5" stroke-linecap="round"/>
+            <path d="M40 28 C95 10, 155 15, 200 35 C150 42, 95 45, 40 28 Z" fill="#2d6a4f"/>
+            <path d="M72 52 C135 40, 195 52, 245 82 C185 82, 125 75, 72 52 Z" fill="#40916c"/>
+            <path d="M105 82 C168 78, 225 98, 270 135 C210 128, 155 112, 105 82 Z" fill="#2d6a4f"/>
+            <path d="M138 118 C195 122, 242 148, 275 188 C222 174, 175 152, 138 118 Z" fill="#52b788"/>
+            <path d="M28 45 C12 105, 18 165, 42 215 C46 158, 44 102, 28 45 Z" fill="#40916c"/>
+            <path d="M58 75 C46 135, 58 195, 88 242 C85 185, 76 130, 58 75 Z" fill="#2d6a4f"/>
+            <path d="M92 110 C86 168, 104 222, 138 265 C128 212, 112 160, 92 110 Z" fill="#52b788"/>
+        </svg>
+
+        <!-- Daun Monstera Kanan Bawah -->
+        <svg class="leaf-decor leaf-bottom-right" viewBox="0 0 320 320" fill="none">
+            <path d="M300 305 C240 245, 185 185, 110 115" stroke="#1b4332" stroke-width="6" stroke-linecap="round"/>
+            <path d="M275 280 C305 210, 290 130, 235 80 C215 110, 235 125, 220 138 C205 150, 185 125, 175 100 C150 115, 165 140, 150 152 C135 162, 115 135, 95 115 C75 145, 80 190, 115 225 C145 255, 180 245, 195 260 C208 272, 185 288, 170 295 C210 310, 250 302, 275 280 Z" fill="#2d6a4f"/>
+            <ellipse cx="215" cy="185" rx="14" ry="8" transform="rotate(-35 215 185)" fill="#dff2e7"/>
+            <ellipse cx="172" cy="215" rx="13" ry="7" transform="rotate(-35 172 215)" fill="#dff2e7"/>
+        </svg>
+
+        <!-- Daun Pakis Kiri Bawah -->
+        <svg class="leaf-decor leaf-bottom-left" viewBox="0 0 220 220" fill="none">
+            <path d="M15 205 C65 145, 120 95, 190 45" stroke="#2d6a4f" stroke-width="4" stroke-linecap="round"/>
+            <path d="M45 172 C35 135, 45 105, 65 85 C62 115, 58 145, 45 172 Z" fill="#40916c"/>
+            <path d="M80 138 C75 102, 88 72, 112 55 C104 85, 95 112, 80 138 Z" fill="#52b788"/>
+            <path d="M118 104 C118 72, 134 46, 158 32 C146 58, 134 82, 118 104 Z" fill="#40916c"/>
+            <path d="M55 165 C92 168, 125 160, 150 142 C120 146, 88 152, 55 165 Z" fill="#2d6a4f"/>
+            <path d="M92 130 C128 130, 158 120, 180 100 C152 106, 122 115, 92 130 Z" fill="#40916c"/>
+        </svg>
+    </div>
+
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="brand-pill">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+                    <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+                </svg>
+                <span>Eco-Telemetry • ESP32</span>
+            </div>
+            <h1>Dashboard RC Car</h1>
+            <p>Pemantauan Sensor Lingkungan & Navigasi Secara Real-Time</p>
+
+            <div class="status-bar">
+                <div id="conn-status" class="connection-status">
+                    <span class="status-dot"></span>
+                    <span id="conn-text">Menghubungkan ke Firebase...</span>
+                </div>
+                <div id="last-update" class="last-update">Menunggu data sensor...</div>
+                <button id="sim-toggle" class="sim-btn" type="button" onclick="toggleSimulation()">
+                    Mode Simulasi: Off
+                </button>
+            </div>
+        </header>
+
+        <main class="grid-container">
+            <!-- 1. Sensor Suhu (DHT22) -->
+            <section class="card">
+                <svg class="card-leaf-watermark" viewBox="0 0 24 24" fill="#1b4332">
+                    <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8Z"/>
+                </svg>
+                <div class="card-top">
+                    <div class="card-title-group">
+                        <div class="sensor-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>
+                            </svg>
+                        </div>
+                        <h3>Suhu Lingkungan</h3>
+                    </div>
+                    <span class="sensor-chip">DHT22</span>
+                </div>
+
+                <div class="gauge-wrapper">
+                    <svg viewBox="0 0 36 36" class="circular-chart">
+                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle color-temp" id="circle-temp" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <text x="18" y="18.3" class="percentage" id="val-temp">0</text>
+                        <text x="18" y="23.8" class="sensor-label">°CELSIUS</text>
+                    </svg>
+                </div>
+
+                <div class="scale-range">Rentang Ideal: ≤ 35°C</div>
+                <div id="status-temp" class="status-badge">Suhu Aman</div>
+            </section>
+
+            <!-- 2. Sensor Kelembapan (DHT22) -->
+            <section class="card">
+                <svg class="card-leaf-watermark" viewBox="0 0 24 24" fill="#1b4332">
+                    <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8Z"/>
+                </svg>
+                <div class="card-top">
+                    <div class="card-title-group">
+                        <div class="sensor-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                            </svg>
+                        </div>
+                        <h3>Kelembapan Udara</h3>
+                    </div>
+                    <span class="sensor-chip">DHT22</span>
+                </div>
+
+                <div class="gauge-wrapper">
+                    <svg viewBox="0 0 36 36" class="circular-chart">
+                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle color-hum" id="circle-hum" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <text x="18" y="18.3" class="percentage" id="val-hum">0</text>
+                        <text x="18" y="23.8" class="sensor-label">PERSEN (%)</text>
+                    </svg>
+                </div>
+
+                <div class="scale-range">Rentang Ideal: 30% – 80%</div>
+                <div id="status-hum" class="status-badge">Normal</div>
+            </section>
+
+            <!-- 3. Sensor Gas (MQ-2) -->
+            <section class="card">
+                <svg class="card-leaf-watermark" viewBox="0 0 24 24" fill="#1b4332">
+                    <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8Z"/>
+                </svg>
+                <div class="card-top">
+                    <div class="card-title-group">
+                        <div class="sensor-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/>
+                                <path d="M9.6 4.6A2 2 0 1 1 11 8H2"/>
+                                <path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>
+                            </svg>
+                        </div>
+                        <h3>Kadar Gas / Asap</h3>
+                    </div>
+                    <span class="sensor-chip">MQ-2</span>
+                </div>
+
+                <div class="gauge-wrapper">
+                    <svg viewBox="0 0 36 36" class="circular-chart">
+                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle color-gas" id="circle-gas" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <text x="18" y="18.3" class="percentage" id="val-gas">0</text>
+                        <text x="18" y="23.8" class="sensor-label">RAW ADC</text>
+                    </svg>
+                </div>
+
+                <div class="scale-range">Ambang Bahaya: > 1500 ADC</div>
+                <div id="status-gas" class="status-badge">Udara Bersih</div>
+            </section>
+
+            <!-- 4. Sensor Jarak (HC-SR04) -->
+            <section class="card">
+                <svg class="card-leaf-watermark" viewBox="0 0 24 24" fill="#1b4332">
+                    <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8Z"/>
+                </svg>
+                <div class="card-top">
+                    <div class="card-title-group">
+                        <div class="sensor-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </div>
+                        <h3>Jarak Rintangan</h3>
+                    </div>
+                    <span class="sensor-chip">HC-SR04</span>
+                </div>
+
+                <div class="gauge-wrapper">
+                    <svg viewBox="0 0 36 36" class="circular-chart">
+                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle color-dist" id="circle-dist" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <text x="18" y="18.3" class="percentage" id="val-dist">0</text>
+                        <text x="18" y="23.8" class="sensor-label">CENTIMETER</text>
+                    </svg>
+                </div>
+
+                <div class="scale-range">Batas Aman: ≥ 15 cm</div>
+                <div id="status-dist" class="status-badge">Jalan Aman</div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Konfigurasi Firebase Realtime Database
+        const FIREBASE_URL = "https://rc-telementri-default-rtdb.asia-southeast1.firebasedatabase.app";
+        const FIREBASE_AUTH = "y4KdPtOZOokvMWl8qdZuSUpeOla0NAXgQsOW5a02";
+        const DB_PATH = "/Sensor.json";
+
+        const streamUrl = `${FIREBASE_URL}${DB_PATH}?auth=${FIREBASE_AUTH}`;
+
+        // State data sensor
+        let sensorData = { Suhu: 0, Kelembapan: 0, Gas: 0, Jarak: 0 };
+        let hasReceivedData = false;
+        let simInterval = null;
+
+        const statusBadge = document.getElementById('conn-status');
+        const statusText = document.getElementById('conn-text');
+        const lastUpdateText = document.getElementById('last-update');
+        const eventSource = new EventSource(streamUrl);
+
+        eventSource.onopen = () => {
+            if (!simInterval) {
+                statusText.textContent = "Terhubung Real-Time";
+                statusBadge.style.backgroundColor = "#d8f3dc";
+                statusBadge.style.color = "#1b4332";
+                statusBadge.style.borderColor = "rgba(45, 106, 79, 0.28)";
+            }
+        };
+
+        eventSource.onerror = (err) => {
+            console.error("EventSource error:", err);
+            if (!simInterval) {
+                statusText.textContent = "Koneksi Terputus / Mencoba Ulang...";
+                statusBadge.style.backgroundColor = "#fee2e2";
+                statusBadge.style.color = "#b91c1c";
+                statusBadge.style.borderColor = "rgba(220, 38, 38, 0.28)";
+            }
+        };
+
+        eventSource.addEventListener('put', handleFirebaseData);
+        eventSource.addEventListener('patch', handleFirebaseData);
+
+        function handleFirebaseData(event) {
+            if (simInterval) return; // Abaikan stream saat mode simulasi aktif
+            if (!event.data || event.data === "null") return;
+
+            try {
+                const payload = JSON.parse(event.data);
+                if (!payload || payload.data === undefined) return;
+
+                if (payload.path === "/") {
+                    if (payload.data && typeof payload.data === "object") {
+                        sensorData = { ...sensorData, ...payload.data };
+                        hasReceivedData = true;
+                    }
+                } else {
+                    const key = payload.path.replace(/^\//, "");
+                    if (key in sensorData) {
+                        sensorData[key] = payload.data;
+                        hasReceivedData = true;
+                    }
+                }
+
+                const now = new Date().toLocaleTimeString('id-ID');
+                lastUpdateText.textContent = `Update: ${now}`;
+                updateDashboard();
+            } catch (error) {
+                console.error("Gagal mem-parsing data Firebase:", error);
+            }
+        }
+
+        // Fungsi pembaruan Indikator Visual (Gauges)
+        function updateGauge(idPrefix, rawValue, min, max, alertColor = null) {
+            const value = Number(rawValue);
+            const safeValue = Number.isFinite(value) ? value : 0;
+
+            let percentage = ((safeValue - min) / (max - min)) * 100;
+            percentage = Math.min(100, Math.max(0, percentage));
+
+            const circle = document.getElementById(`circle-${idPrefix}`);
+            const textVal = document.getElementById(`val-${idPrefix}`);
+
+            if (circle && textVal) {
+                circle.setAttribute('stroke-dasharray', `${percentage.toFixed(1)}, 100`);
+                circle.style.stroke = alertColor ? alertColor : "";
+                textVal.textContent = Number.isInteger(safeValue)
+                    ? safeValue
+                    : safeValue.toFixed(1);
+            }
+
+            return safeValue;
+        }
+
+        // Fungsi evaluasi status sensor
+        function updateDashboard() {
+            // 1. DHT22 Suhu (0 - 50 °C)
+            const isOverheat = Number(sensorData.Suhu) > 35;
+            updateGauge('temp', sensorData.Suhu, 0, 50, isOverheat ? "#dc2626" : null);
+            const badgeTemp = document.getElementById('status-temp');
+            if (isOverheat) {
+                badgeTemp.textContent = "Overheat!";
+                badgeTemp.className = "status-badge status-danger";
+            } else {
+                badgeTemp.textContent = "Suhu Aman";
+                badgeTemp.className = "status-badge";
+            }
+
+            // 2. DHT22 Kelembapan (0 - 100 %)
+            const humVal = Number(sensorData.Kelembapan);
+            const isHumWarn = humVal > 80 || (humVal < 30 && hasReceivedData);
+            updateGauge('hum', sensorData.Kelembapan, 0, 100, isHumWarn ? "#d97706" : null);
+            const badgeHum = document.getElementById('status-hum');
+            if (humVal > 80) {
+                badgeHum.textContent = "Terlalu Lembap";
+                badgeHum.className = "status-badge status-warning";
+            } else if (humVal < 30 && hasReceivedData) {
+                badgeHum.textContent = "Udara Kering";
+                badgeHum.className = "status-badge status-warning";
+            } else {
+                badgeHum.textContent = "Normal";
+                badgeHum.className = "status-badge";
+            }
+
+            // 3. MQ-2 Gas / Asap (ADC ESP32: 0 - 4095)
+            const isGasDanger = Number(sensorData.Gas) > 1500;
+            updateGauge('gas', sensorData.Gas, 0, 4095, isGasDanger ? "#dc2626" : null);
+            const badgeGas = document.getElementById('status-gas');
+            if (isGasDanger) {
+                badgeGas.textContent = "Deteksi Gas / Asap!";
+                badgeGas.className = "status-badge status-danger";
+            } else {
+                badgeGas.textContent = "Udara Bersih";
+                badgeGas.className = "status-badge";
+            }
+
+            // 4. HC-SR04 Jarak Rintangan (0 - 200 CM)
+            const isCollisionDanger = hasReceivedData && Number(sensorData.Jarak) < 15;
+            updateGauge('dist', sensorData.Jarak, 0, 200, isCollisionDanger ? "#dc2626" : null);
+            const badgeDist = document.getElementById('status-dist');
+            if (isCollisionDanger) {
+                badgeDist.textContent = "Awas Tabrakan!";
+                badgeDist.className = "status-badge status-danger";
+            } else {
+                badgeDist.textContent = "Jalan Aman";
+                badgeDist.className = "status-badge";
+            }
+        }
+
+        // Tombol Simulasi Data untuk Pengujian Tampilan Tanpa Hardware
+        function toggleSimulation() {
+            const btn = document.getElementById('sim-toggle');
+            if (simInterval) {
+                clearInterval(simInterval);
+                simInterval = null;
+                btn.textContent = "Mode Simulasi: Off";
+                btn.classList.remove("active");
+                statusText.textContent = "Terhubung Real-Time";
+                statusBadge.style.backgroundColor = "#d8f3dc";
+                statusBadge.style.color = "#1b4332";
+            } else {
+                btn.textContent = "Mode Simulasi: On";
+                btn.classList.add("active");
+                statusText.textContent = "Simulasi Aktif";
+                statusBadge.style.backgroundColor = "#fef0c7";
+                statusBadge.style.color = "#92400e";
+
+                const runStep = () => {
+                    hasReceivedData = true;
+                    sensorData = {
+                        Suhu: +(26 + Math.random() * 11).toFixed(1),
+                        Kelembapan: Math.floor(55 + Math.random() * 30),
+                        Gas: Math.floor(320 + Math.random() * 1350),
+                        Jarak: Math.floor(10 + Math.random() * 140)
+                    };
+                    lastUpdateText.textContent = `Simulasi: ${new Date().toLocaleTimeString('id-ID')}`;
+                    updateDashboard();
+                };
+                runStep();
+                simInterval = setInterval(runStep, 2200);
+            }
+        }
+
+        // Tutup koneksi stream saat tab ditutup
+        window.addEventListener('beforeunload', () => {
+            eventSource.close();
+        });
+    </script>
+</body>
+</html>
