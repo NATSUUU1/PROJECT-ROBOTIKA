@@ -227,60 +227,6 @@
             flex-wrap: wrap;
         }
 
-        /* Pill Notifikasi Koneksi ESP32 (Terhubung / Tidak Terhubung) */
-        .device-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 7px 16px;
-            background-color: var(--warn-bg);
-            color: var(--warn-text);
-            border: 1px solid rgba(217, 119, 6, 0.28);
-            border-radius: 999px;
-            font-size: 0.84rem;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(27, 67, 50, 0.06);
-            transition: all 0.3s ease;
-        }
-
-        .device-indicator.online {
-            background-color: var(--safe-bg);
-            color: var(--safe-text);
-            border-color: rgba(45, 106, 79, 0.32);
-        }
-
-        .device-indicator.offline {
-            background-color: var(--danger-bg);
-            color: var(--danger-text);
-            border-color: rgba(220, 38, 38, 0.32);
-        }
-
-        .status-dot {
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background-color: currentColor;
-            flex-shrink: 0;
-        }
-
-        .device-indicator.online .status-dot {
-            animation: pulseGreen 1.6s infinite ease-in-out;
-        }
-
-        .device-indicator.offline .status-dot {
-            animation: blinkFast 1s infinite ease-in-out;
-        }
-
-        @keyframes pulseGreen {
-            0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(27, 67, 50, 0.4); }
-            50% { opacity: 0.75; transform: scale(1.15); box-shadow: 0 0 0 5px rgba(27, 67, 50, 0); }
-        }
-
-        @keyframes blinkFast {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.25; }
-        }
-
         .last-update {
             font-size: 0.83rem;
             color: var(--text-muted);
@@ -293,12 +239,15 @@
             font-variant-numeric: tabular-nums;
         }
 
-        .sim-btn {
+        .pill-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             font-family: inherit;
             font-size: 0.82rem;
             font-weight: 700;
             color: var(--leaf-main);
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.88);
             border: 1px solid rgba(45, 106, 79, 0.28);
             padding: 7px 15px;
             border-radius: 999px;
@@ -306,22 +255,37 @@
             transition: all 0.25s ease;
         }
 
-        .sim-btn:hover {
+        .pill-btn:hover {
             background: var(--leaf-main);
             color: #ffffff;
         }
 
-        .sim-btn.active {
+        .pill-btn.active {
             background: var(--leaf-deep);
             color: #d8f3dc;
             border-color: var(--leaf-deep);
         }
 
-        /* Banner Utama: Status Pembacaan Sensor (Hijau = Sensor Terbaca, Merah = Sensor Tidak Terbaca) */
-        .sensor-banner {
+        .pill-btn.muted {
+            color: var(--danger-text);
+            border-color: rgba(220, 38, 38, 0.3);
+            background: rgba(254, 226, 226, 0.7);
+        }
+
+        /* =========================================================
+           2 BAR NOTIFIKASI TERPISAH (ESP32 & PEMBACAAN SENSOR)
+           ========================================================= */
+        .banners-stack {
             width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
             margin-bottom: 24px;
-            padding: 15px 22px;
+        }
+
+        .notif-bar {
+            width: 100%;
+            padding: 14px 20px;
             border-radius: 18px;
             display: flex;
             align-items: center;
@@ -330,29 +294,37 @@
             flex-wrap: wrap;
             backdrop-filter: blur(12px);
             transition: all 0.35s ease;
-            box-shadow: 0 8px 24px rgba(27, 67, 50, 0.06);
+            box-shadow: 0 8px 22px rgba(27, 67, 50, 0.05);
         }
 
-        .sensor-banner.state-checking {
+        .notif-bar.state-checking {
             background: rgba(254, 240, 199, 0.88);
             border: 1.5px solid rgba(217, 119, 6, 0.3);
             color: #78350f;
         }
 
-        /* Hijau saat sensor terbaca */
-        .sensor-banner.state-readable {
+        /* Hijau: ESP32 Terhubung / Sensor Terbaca */
+        .notif-bar.state-green {
             background: rgba(209, 250, 229, 0.94);
             border: 1.5px solid rgba(16, 185, 129, 0.45);
             color: #065f46;
-            box-shadow: 0 10px 26px rgba(16, 185, 129, 0.12);
+            box-shadow: 0 10px 24px rgba(16, 185, 129, 0.1);
         }
 
-        /* Merah saat sensor tidak terbaca */
-        .sensor-banner.state-unreadable {
+        /* Kuning/Oranye: Sensor Mendeteksi Peringatan / Ambang Batas */
+        .notif-bar.state-warn {
+            background: rgba(254, 243, 199, 0.95);
+            border: 1.5px solid rgba(245, 158, 11, 0.48);
+            color: #92400e;
+            box-shadow: 0 10px 24px rgba(217, 119, 6, 0.11);
+        }
+
+        /* Merah: ESP32 Terputus / Sensor Tidak Terbaca */
+        .notif-bar.state-red {
             background: rgba(254, 226, 226, 0.95);
             border: 1.5px solid rgba(220, 38, 38, 0.42);
             color: #991b1b;
-            box-shadow: 0 10px 26px rgba(185, 28, 28, 0.12);
+            box-shadow: 0 10px 24px rgba(185, 28, 28, 0.11);
         }
 
         .banner-left {
@@ -368,34 +340,51 @@
             display: grid;
             place-items: center;
             flex-shrink: 0;
-            background: rgba(255, 255, 255, 0.78);
+            background: rgba(255, 255, 255, 0.82);
+        }
+
+        .banner-text {
+            text-align: left;
+        }
+
+        .banner-category {
+            display: inline-block;
+            font-size: 0.67rem;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            opacity: 0.78;
+            margin-bottom: 2px;
         }
 
         .banner-text h4 {
             margin: 0 0 2px 0;
-            font-size: 1rem;
+            font-size: 0.98rem;
             font-weight: 800;
             letter-spacing: -0.2px;
         }
 
         .banner-text p {
             margin: 0;
-            font-size: 0.83rem;
+            font-size: 0.82rem;
             opacity: 0.92;
             font-weight: 500;
         }
 
         .banner-right-tag {
-            font-size: 0.77rem;
+            font-size: 0.76rem;
             font-weight: 800;
             padding: 6px 14px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.78);
+            background: rgba(255, 255, 255, 0.82);
             font-variant-numeric: tabular-nums;
             letter-spacing: 0.3px;
+            white-space: nowrap;
         }
 
-        /* Pop-up Toast Notification (Notifikasi Terhubung / Tidak Terhubung saat ESP32 dicolok/dicabut) */
+        /* =========================================================
+           POP-UP TOAST NOTIFICATION (2 KATEGORI BERBEDA)
+           ========================================================= */
         .toast-container {
             position: fixed;
             top: 20px;
@@ -410,27 +399,33 @@
 
         .toast-alert {
             pointer-events: auto;
-            min-width: 295px;
-            max-width: 380px;
-            padding: 14px 16px;
+            min-width: 300px;
+            max-width: 390px;
+            padding: 13px 16px;
             border-radius: 16px;
             backdrop-filter: blur(14px);
-            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.16);
             display: flex;
             align-items: flex-start;
             gap: 12px;
             animation: slideInToast 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
-        .toast-alert.toast-online {
+        .toast-alert.toast-green {
             background: rgba(236, 253, 245, 0.98);
-            border: 1.5px solid rgba(16, 185, 129, 0.48);
+            border: 1.5px solid rgba(16, 185, 129, 0.5);
             color: #065f46;
         }
 
-        .toast-alert.toast-offline {
+        .toast-alert.toast-warn {
+            background: rgba(255, 251, 235, 0.98);
+            border: 1.5px solid rgba(245, 158, 11, 0.5);
+            color: #92400e;
+        }
+
+        .toast-alert.toast-red {
             background: rgba(254, 242, 242, 0.98);
-            border: 1.5px solid rgba(239, 68, 68, 0.48);
+            border: 1.5px solid rgba(239, 68, 68, 0.5);
             color: #991b1b;
         }
 
@@ -438,14 +433,26 @@
             flex: 1;
         }
 
+        .toast-badge {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            padding: 2px 7px;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.06);
+            margin-bottom: 4px;
+        }
+
         .toast-title {
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             font-weight: 800;
             margin: 0 0 2px 0;
         }
 
         .toast-desc {
-            font-size: 0.79rem;
+            font-size: 0.78rem;
             margin: 0;
             line-height: 1.35;
             opacity: 0.92;
@@ -670,7 +677,7 @@
 </head>
 <body>
 
-    <!-- Container Pop-up Toast Notifikasi ESP32 -->
+    <!-- Container Pop-up Toast Notifikasi (Terpisah antara Koneksi ESP32 & Pembacaan Sensor) -->
     <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
     <!-- Efek Pencahayaan Matahari Tropis & Partikel Embun -->
@@ -717,7 +724,7 @@
                         <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
                         <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
                     </svg>
-                    <span>Eco-Telemetry &bull; ESP32</span>
+                    <span>Eco-Telemetry • ESP32</span>
                 </div>
 
                 <!-- Jam & Tanggal Real-Time -->
@@ -733,37 +740,62 @@
             </div>
 
             <h1>Dashboard RC Car</h1>
-            <p>Pemantauan Sensor Lingkungan &amp; Navigasi Secara Real-Time</p>
+            <p>Pemantauan Sensor Lingkungan & Navigasi Secara Real-Time</p>
 
             <div class="status-bar">
-                <!-- Notifikasi Koneksi ESP32: Terhubung / Tidak Terhubung -->
-                <div id="device-indicator" class="device-indicator">
-                    <span class="status-dot"></span>
-                    <span id="device-status-text">Memeriksa ESP32...</span>
-                </div>
-
                 <div id="last-update" class="last-update">Update Data: --:--:--</div>
 
-                <button id="sim-toggle" class="sim-btn" type="button" onclick="toggleSimulation()">
+                <!-- Tombol Alarm Notifikasi -->
+                <button id="alarm-toggle" class="pill-btn active" type="button" onclick="toggleAlarmSound()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                    </svg>
+                    <span id="alarm-btn-text">Alarm Suara: Aktif</span>
+                </button>
+
+                <button id="sim-toggle" class="pill-btn" type="button" onclick="toggleSimulation()">
                     Mode Simulasi: Off
                 </button>
             </div>
         </header>
 
-        <!-- Banner Pembacaan Sensor: Hijau = Sensor Terbaca, Merah = Sensor Tidak Terbaca -->
-        <div id="sensor-banner" class="sensor-banner state-checking" role="status">
-            <div class="banner-left">
-                <div id="banner-icon" class="banner-icon">
-                    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/>
-                    </svg>
+        <!-- 2 BAR NOTIFIKASI TERPISAH -->
+        <div class="banners-stack">
+            <!-- BAR 1: Notifikasi Koneksi Perangkat ESP32 (Dicolok / Menyala vs Mati / Terputus) -->
+            <div id="esp-banner" class="notif-bar state-checking" role="status">
+                <div class="banner-left">
+                    <div id="esp-banner-icon" class="banner-icon">
+                        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3"/><path d="M15 1v3"/><path d="M9 20v3"/><path d="M15 20v3"/><path d="M20 9h3"/><path d="M20 14h3"/><path d="M1 9h3"/><path d="M1 14h3"/>
+                        </svg>
+                    </div>
+                    <div class="banner-text">
+                        <span class="banner-category">Status Perangkat ESP32</span>
+                        <h4 id="esp-banner-title">Memeriksa Koneksi ESP32...</h4>
+                        <p id="esp-banner-desc">Menunggu sinyal dari mikrokontroler ESP32 saat dicolokkan atau dinyalakan.</p>
+                    </div>
                 </div>
-                <div class="banner-text">
-                    <h4 id="banner-title">Memeriksa Pembacaan Sensor...</h4>
-                    <p id="banner-desc">Menunggu aliran data sensor dari perangkat ESP32.</p>
-                </div>
+                <div id="esp-banner-tag" class="banner-right-tag">MENGECEK</div>
             </div>
-            <div id="banner-tag" class="banner-right-tag">MENGECEK</div>
+
+            <!-- BAR 2: Notifikasi Pembacaan Nilai Sensor (Terbaca / Terdeteksi / Tidak Terbaca) -->
+            <div id="sensor-banner" class="notif-bar state-checking" role="status">
+                <div class="banner-left">
+                    <div id="sensor-banner-icon" class="banner-icon">
+                        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                        </svg>
+                    </div>
+                    <div class="banner-text">
+                        <span class="banner-category">Status Pembacaan Sensor</span>
+                        <h4 id="sensor-banner-title">Memeriksa Pembacaan Sensor...</h4>
+                        <p id="sensor-banner-desc">Menunggu hasil pembacaan data sensor lingkungan & rintangan.</p>
+                    </div>
+                </div>
+                <div id="sensor-banner-tag" class="banner-right-tag">MENGECEK</div>
+            </div>
         </div>
 
         <main id="sensor-grid" class="grid-container">
@@ -789,11 +821,11 @@
                         <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         <path class="circle color-temp" id="circle-temp" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                         <text x="18" y="18.3" class="percentage" id="val-temp">--</text>
-                        <text x="18" y="23.8" class="sensor-label">&deg;CELSIUS</text>
+                        <text x="18" y="23.8" class="sensor-label">°CELSIUS</text>
                     </svg>
                 </div>
 
-                <div class="scale-range">Rentang Ideal: &le; 35&deg;C</div>
+                <div class="scale-range">Rentang Ideal: ≤ 35°C</div>
                 <div id="status-temp" class="status-badge status-offline">Tidak Terbaca</div>
             </section>
 
@@ -823,7 +855,7 @@
                     </svg>
                 </div>
 
-                <div class="scale-range">Rentang Ideal: 30% &ndash; 80%</div>
+                <div class="scale-range">Rentang Ideal: 30% – 80%</div>
                 <div id="status-hum" class="status-badge status-offline">Tidak Terbaca</div>
             </section>
 
@@ -855,7 +887,7 @@
                     </svg>
                 </div>
 
-                <div class="scale-range">Ambang Bahaya: &gt; 1500 ADC</div>
+                <div class="scale-range">Ambang Bahaya: > 1500 ADC</div>
                 <div id="status-gas" class="status-badge status-offline">Tidak Terbaca</div>
             </section>
 
@@ -886,7 +918,7 @@
                     </svg>
                 </div>
 
-                <div class="scale-range">Batas Aman: &ge; 15 cm</div>
+                <div class="scale-range">Batas Aman: ≥ 15 cm</div>
                 <div id="status-dist" class="status-badge status-offline">Tidak Terbaca</div>
             </section>
         </main>
@@ -894,7 +926,117 @@
 
     <script>
         // ==========================================
-        // 1. JAM & TANGGAL REAL-TIME
+        // 1. SISTEM ALARM SUARA (WEB AUDIO API)
+        // ==========================================
+        let audioCtx = null;
+        let alarmEnabled = true;
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) {
+                    audioCtx = new AudioContextClass();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Aktifkan AudioContext pada interaksi pertama user di halaman
+        ['click', 'touchstart', 'keydown'].forEach(evt => {
+            window.addEventListener(evt, initAudioContext, { once: true });
+        });
+
+        function playAlarmSound(type = 'connected') {
+            if (!alarmEnabled) return;
+            try {
+                initAudioContext();
+                if (!audioCtx) return;
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'connected') {
+                    // Alarm Terhubung: 4 nada naik yang jernih (C5 -> E5 -> G5 -> C6)
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.11);
+
+                        gain.gain.setValueAtTime(0.001, now + idx * 0.11);
+                        gain.gain.exponentialRampToValueAtTime(0.24, now + idx * 0.11 + 0.02);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.11 + 0.24);
+
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+
+                        osc.start(now + idx * 0.11);
+                        osc.stop(now + idx * 0.11 + 0.25);
+                    });
+                } else if (type === 'disconnected') {
+                    // Nada turun saat ESP32 terputus / mati
+                    const notes = [440, 329.63];
+                    notes.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.16);
+
+                        gain.gain.setValueAtTime(0.001, now + idx * 0.16);
+                        gain.gain.exponentialRampToValueAtTime(0.18, now + idx * 0.16 + 0.02);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.16 + 0.28);
+
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+
+                        osc.start(now + idx * 0.16);
+                        osc.stop(now + idx * 0.16 + 0.3);
+                    });
+                } else if (type === 'sensor-alert') {
+                    // Beep singkat saat sensor mendeteksi bahaya
+                    [880, 880].forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.14);
+
+                        gain.gain.setValueAtTime(0.001, now + idx * 0.14);
+                        gain.gain.exponentialRampToValueAtTime(0.14, now + idx * 0.14 + 0.015);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.14 + 0.11);
+
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+
+                        osc.start(now + idx * 0.14);
+                        osc.stop(now + idx * 0.14 + 0.12);
+                    });
+                }
+            } catch (e) {
+                console.warn("Audio alarm tidak dapat diputar:", e);
+            }
+        }
+
+        function toggleAlarmSound() {
+            const btn = document.getElementById('alarm-toggle');
+            const label = document.getElementById('alarm-btn-text');
+            alarmEnabled = !alarmEnabled;
+
+            if (alarmEnabled) {
+                btn.classList.add('active');
+                btn.classList.remove('muted');
+                label.textContent = "Alarm Suara: Aktif";
+                playAlarmSound('connected'); // Bunyikan pratinjau alarm saat diaktifkan
+            } else {
+                btn.classList.remove('active');
+                btn.classList.add('muted');
+                label.textContent = "Alarm Suara: Mati";
+            }
+        }
+
+        // ==========================================
+        // 2. JAM & TANGGAL REAL-TIME
         // ==========================================
         function formatTime24(dateObj = new Date()) {
             return dateObj.toLocaleTimeString('id-ID', {
@@ -920,49 +1062,60 @@
         setInterval(updateRealtimeClock, 1000);
 
         // ==========================================
-        // 2. LOGIKA KONEKSI ESP32 & PEMBACAAN SENSOR
+        // 3. LOGIKA KONEKSI ESP32 & PEMBACAAN SENSOR
         // ==========================================
         const FIREBASE_URL = "https://rc-telementri-default-rtdb.asia-southeast1.firebasedatabase.app";
         const FIREBASE_AUTH = "y4KdPtOZOokvMWl8qdZuSUpeOla0NAXgQsOW5a02";
         const DB_PATH = "/Sensor.json";
         const streamUrl = `${FIREBASE_URL}${DB_PATH}?auth=${FIREBASE_AUTH}`;
 
-        const INITIAL_VERIFY_MS = 3500;   // Verifikasi awal saat web dibuka (3.5 detik)
-        const OFFLINE_TIMEOUT_MS = 7000;  // Jika 7 detik tidak ada data baru -> Tidak Terhubung
+        const INITIAL_VERIFY_MS = 3500;
+        const OFFLINE_TIMEOUT_MS = 7000;
 
         let sensorData = { Suhu: null, Kelembapan: null, Gas: null, Jarak: null };
-        let initialPacketSkipped = false; // Paket pertama dari Firebase SSE adalah cache lama
-        let isEspConnected = null;        // null = mengecek, true = terhubung, false = tidak terhubung
+        let initialPacketSkipped = false;
+        let isEspConnected = null;        // Status ESP32: null | true | false
+        let lastSensorStateKey = null;    // Melacak perubahan status pembacaan sensor agar toast tidak spam
         let watchdogTimer = null;
         let simInterval = null;
 
-        const deviceIndicator = document.getElementById('device-indicator');
-        const deviceStatusText = document.getElementById('device-status-text');
         const lastUpdateText = document.getElementById('last-update');
-        const bannerEl = document.getElementById('sensor-banner');
-        const bannerIcon = document.getElementById('banner-icon');
-        const bannerTitle = document.getElementById('banner-title');
-        const bannerDesc = document.getElementById('banner-desc');
-        const bannerTag = document.getElementById('banner-tag');
         const sensorGrid = document.getElementById('sensor-grid');
 
-        // Pop-up Toast Notifikasi (Notifikasi Terhubung / Tidak Terhubung)
-        function showToast(type, title, description) {
+        // Elemen Bar 1: Koneksi ESP32
+        const espBanner = document.getElementById('esp-banner');
+        const espBannerIcon = document.getElementById('esp-banner-icon');
+        const espBannerTitle = document.getElementById('esp-banner-title');
+        const espBannerDesc = document.getElementById('esp-banner-desc');
+        const espBannerTag = document.getElementById('esp-banner-tag');
+
+        // Elemen Bar 2: Pembacaan Sensor
+        const sensorBanner = document.getElementById('sensor-banner');
+        const sensorBannerIcon = document.getElementById('sensor-banner-icon');
+        const sensorBannerTitle = document.getElementById('sensor-banner-title');
+        const sensorBannerDesc = document.getElementById('sensor-banner-desc');
+        const sensorBannerTag = document.getElementById('sensor-banner-tag');
+
+        // Pop-up Toast dengan Kategori Terpisah ("KONEKSI ESP32" vs "PEMBACAAN SENSOR")
+        function showToast(category, variant, title, description) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `toast-alert ${type === 'online' ? 'toast-online' : 'toast-offline'}`;
+            toast.className = `toast-alert toast-${variant}`;
 
-            const iconSvg = type === 'online'
-                ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
-                : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+            const iconSvg = category === 'ESP32'
+                ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3"/><path d="M15 1v3"/><path d="M9 20v3"/><path d="M15 20v3"/><path d="M20 9h3"/><path d="M20 14h3"/><path d="M1 9h3"/><path d="M1 14h3"/></svg>`
+                : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`;
+
+            const badgeLabel = category === 'ESP32' ? 'KONEKSI ESP32' : 'PEMBACAAN SENSOR';
 
             toast.innerHTML = `
                 <div style="margin-top:2px; flex-shrink:0;">${iconSvg}</div>
                 <div class="toast-body">
+                    <span class="toast-badge">${badgeLabel}</span>
                     <p class="toast-title">${title}</p>
                     <p class="toast-desc">${description}</p>
                 </div>
-                <button class="toast-close" aria-label="Tutup">&times;</button>
+                <button class="toast-close" aria-label="Tutup">×</button>
             `;
 
             toast.querySelector('.toast-close').onclick = () => toast.remove();
@@ -978,82 +1131,161 @@
             }, 5500);
         }
 
-        // Cek apakah nilai sensor valid dan terbaca
         function isValidNumber(val) {
             return val !== null && val !== undefined && val !== "" && Number.isFinite(Number(val));
         }
 
-        function areSensorsReadable() {
-            return isValidNumber(sensorData.Suhu) &&
-                   isValidNumber(sensorData.Kelembapan) &&
-                   isValidNumber(sensorData.Gas) &&
-                   isValidNumber(sensorData.Jarak);
+        // Evaluasi lengkap status pembacaan sensor & deteksi ambang batas
+        function evaluateSensorReadings() {
+            if (!isEspConnected) {
+                return {
+                    stateKey: 'offline',
+                    variant: 'red',
+                    title: 'Sensor Tidak Terbaca',
+                    desc: 'Tidak ada pembacaan nilai sensor karena perangkat ESP32 dalam keadaan mati / terputus.',
+                    tag: 'TIDAK TERBACA'
+                };
+            }
+
+            const missingSensors = [];
+            if (!isValidNumber(sensorData.Suhu)) missingSensors.push('Suhu (DHT22)');
+            if (!isValidNumber(sensorData.Kelembapan)) missingSensors.push('Kelembapan (DHT22)');
+            if (!isValidNumber(sensorData.Gas)) missingSensors.push('Gas/Asap (MQ-2)');
+            if (!isValidNumber(sensorData.Jarak)) missingSensors.push('Jarak (HC-SR04)');
+
+            if (missingSensors.length > 0) {
+                return {
+                    stateKey: 'missing-' + missingSensors.join(','),
+                    variant: 'red',
+                    title: 'Sensor Tidak Terbaca',
+                    desc: `ESP32 menyala, namun sensor tidak terbaca: ${missingSensors.join(', ')}.`,
+                    tag: 'TIDAK TERBACA'
+                };
+            }
+
+            // Cek kondisi yang terdeteksi oleh sensor
+            const detections = [];
+            const suhu = Number(sensorData.Suhu);
+            const hum = Number(sensorData.Kelembapan);
+            const gas = Number(sensorData.Gas);
+            const jarak = Number(sensorData.Jarak);
+
+            if (suhu > 35) detections.push(`Suhu Tinggi (${suhu}°C)`);
+            if (hum > 80) detections.push(`Kelembapan Tinggi (${hum}%)`);
+            if (hum < 30) detections.push(`Udara Kering (${hum}%)`);
+            if (gas > 1500) detections.push(`Gas/Asap Terdeteksi (${gas} ADC)`);
+            if (jarak < 15) detections.push(`Rintangan Dekat (${jarak} cm)`);
+
+            if (detections.length > 0) {
+                const detSummary = detections.join(' • ');
+                return {
+                    stateKey: 'detected-' + detections.map(d => d.split(' (')[0]).join(','),
+                    variant: 'warn',
+                    title: `Sensor Terdeteksi: ${detections.map(d => d.split(' (')[0]).join(', ')}`,
+                    desc: `Nilai sensor terbaca aktif dengan peringatan: ${detSummary}.`,
+                    tag: 'TERDETEKSI'
+                };
+            }
+
+            return {
+                stateKey: 'readable-normal',
+                variant: 'green',
+                title: 'Sensor Terbaca (Kondisi Aman)',
+                desc: 'Seluruh sensor (DHT22, MQ-2, HC-SR04) terbaca normal tanpa peringatan.',
+                tag: 'SENSOR TERBACA'
+            };
         }
 
-        // Update Banner Pembacaan Sensor: Hijau = Sensor Terbaca, Merah = Sensor Tidak Terbaca
-        function updateSensorBanner(readable) {
-            if (readable) {
-                bannerEl.className = "sensor-banner state-readable";
-                bannerIcon.innerHTML = `
+        // Update Bar 2 (Notifikasi Pembacaan Sensor) + Toast khusus Sensor
+        function syncSensorNotificationBar(triggerToast = true) {
+            const info = evaluateSensorReadings();
+
+            sensorBanner.className = `notif-bar state-${info.variant}`;
+            sensorBannerTitle.textContent = info.title;
+            sensorBannerDesc.textContent = info.desc;
+            sensorBannerTag.textContent = info.tag;
+
+            if (info.variant === 'green') {
+                sensorBannerIcon.innerHTML = `
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                        <polyline points="22 4 12 14.01 9 11.01"/>
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
                     </svg>`;
-                bannerTitle.textContent = "Sensor Terbaca";
-                bannerDesc.textContent = "Data sensor DHT22, MQ-2, dan HC-SR04 aktif terbaca secara real-time.";
-                bannerTag.textContent = "SENSOR AKTIF";
-                sensorGrid.classList.remove("device-offline");
+            } else if (info.variant === 'warn') {
+                sensorBannerIcon.innerHTML = `
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>`;
             } else {
-                bannerEl.className = "sensor-banner state-unreadable";
-                bannerIcon.innerHTML = `
+                sensorBannerIcon.innerHTML = `
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="15" y1="9" x2="9" y2="15"/>
-                        <line x1="9" y1="9" x2="15" y2="15"/>
+                        <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
                     </svg>`;
-                bannerTitle.textContent = "Sensor Tidak Terbaca";
-                bannerDesc.textContent = isEspConnected
-                    ? "ESP32 terhubung, namun nilai sensor belum terbaca / bernilai kosong."
-                    : "Tidak ada pembacaan sensor karena ESP32 tidak terhubung atau dalam keadaan mati.";
-                bannerTag.textContent = "TIDAK TERBACA";
-                sensorGrid.classList.add("device-offline");
+            }
+
+            // Munculkan Toast & Alarm khusus Pembacaan Sensor saat status pembacaan berubah
+            if (triggerToast && lastSensorStateKey !== info.stateKey) {
+                lastSensorStateKey = info.stateKey;
+                showToast('SENSOR', info.variant, info.title, info.desc);
+                if (info.variant === 'warn') {
+                    playAlarmSound('sensor-alert');
+                }
+            } else {
+                lastSensorStateKey = info.stateKey;
             }
         }
 
-        // Update Status Koneksi ESP32 (Saat Dicolokkan -> Notifikasi Terhubung, Sebaliknya -> Tidak Terhubung)
+        // Update Bar 1 (Notifikasi Koneksi ESP32) + Alarm & Toast khusus ESP32
         function setEspConnectionState(connected) {
             const stateChanged = isEspConnected !== connected;
             isEspConnected = connected;
 
             if (connected) {
-                deviceIndicator.className = "device-indicator online";
-                deviceStatusText.textContent = "Notifikasi: Terhubung";
-
-                const readable = areSensorsReadable();
-                updateSensorBanner(readable);
+                espBanner.className = "notif-bar state-green";
+                espBannerIcon.innerHTML = `
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
+                    </svg>`;
+                espBannerTitle.textContent = "ESP32 Terhubung & Menyala";
+                espBannerDesc.textContent = simInterval
+                    ? "Mode simulasi aktif — perangkat virtual terhubung ke dashboard."
+                    : "Perangkat ESP32 berhasil dicolokkan dan aktif terhubung ke jaringan.";
+                espBannerTag.textContent = "ESP32: TERHUBUNG";
+                sensorGrid.classList.remove("device-offline");
 
                 if (stateChanged) {
+                    playAlarmSound('connected');
                     showToast(
-                        'online',
-                        'Notifikasi: Terhubung',
-                        'ESP32 berhasil dicolokkan dan terhubung ke website.'
+                        'ESP32',
+                        'green',
+                        'ESP32 Terhubung & Menyala',
+                        'Perangkat ESP32 berhasil dicolokkan dan terhubung ke website.'
                     );
                 }
             } else {
-                deviceIndicator.className = "device-indicator offline";
-                deviceStatusText.textContent = "Notifikasi: Tidak Terhubung";
+                espBanner.className = "notif-bar state-red";
+                espBannerIcon.innerHTML = `
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
+                    </svg>`;
+                espBannerTitle.textContent = "ESP32 Tidak Terhubung / Mati";
+                espBannerDesc.textContent = "Perangkat ESP32 terputus, belum dicolokkan, atau daya dalam keadaan mati.";
+                espBannerTag.textContent = "ESP32: TERPUTUS";
+                sensorGrid.classList.add("device-offline");
 
-                updateSensorBanner(false);
                 resetGaugesToOffline();
 
                 if (stateChanged) {
+                    playAlarmSound('disconnected');
                     showToast(
-                        'offline',
-                        'Notifikasi: Tidak Terhubung',
-                        'ESP32 terputus atau belum dicolokkan. Periksa daya perangkat.'
+                        'ESP32',
+                        'red',
+                        'ESP32 Tidak Terhubung / Mati',
+                        'Koneksi ESP32 terputus. Periksa kabel daya atau jaringan Wi-Fi perangkat.'
                     );
                 }
             }
+
+            syncSensorNotificationBar(true);
         }
 
         function resetWatchdog(timeoutMs = OFFLINE_TIMEOUT_MS) {
@@ -1066,7 +1298,7 @@
         }
 
         // ==========================================
-        // 3. STREAMING REAL-TIME FIREBASE
+        // 4. STREAMING REAL-TIME FIREBASE
         // ==========================================
         const eventSource = new EventSource(streamUrl);
 
@@ -1093,8 +1325,6 @@
                 const payload = JSON.parse(event.data);
                 if (!payload || payload.data === undefined) return;
 
-                // Paket pertama saat browser baru dibuka adalah data cache lama di server Firebase.
-                // Paket-paket setelahnya adalah sinyal live langsung saat ESP32 dicolokkan & mengirim data.
                 if (payload.path === "/" && !initialPacketSkipped) {
                     initialPacketSkipped = true;
                     if (payload.data && typeof payload.data === "object") {
@@ -1125,7 +1355,7 @@
         }
 
         // ==========================================
-        // 4. PEMBARUAN GAUGE & STATUS SENSOR
+        // 5. PEMBARUAN GAUGE & KARTU SENSOR
         // ==========================================
         function resetGaugesToOffline() {
             const sensors = [
@@ -1261,7 +1491,7 @@
         }
 
         // ==========================================
-        // 5. MODE SIMULASI
+        // 6. MODE SIMULASI
         // ==========================================
         function toggleSimulation() {
             const btn = document.getElementById('sim-toggle');
@@ -1288,7 +1518,7 @@
                     updateDashboard();
                 };
                 runStep();
-                simInterval = setInterval(runStep, 2200);
+                simInterval = setInterval(runStep, 2500);
             }
         }
 
