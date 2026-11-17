@@ -227,7 +227,7 @@
             flex-wrap: wrap;
         }
 
-        /* Indikator Status Alat ESP32 */
+        /* Pill Notifikasi Koneksi ESP32 (Terhubung / Tidak Terhubung) */
         .device-indicator {
             display: inline-flex;
             align-items: center;
@@ -246,7 +246,7 @@
         .device-indicator.online {
             background-color: var(--safe-bg);
             color: var(--safe-text);
-            border-color: rgba(45, 106, 79, 0.3);
+            border-color: rgba(45, 106, 79, 0.32);
         }
 
         .device-indicator.offline {
@@ -317,8 +317,8 @@
             border-color: var(--leaf-deep);
         }
 
-        /* Banner Notifikasi Utama Mobil Terhubung / Tidak Terhubung */
-        .connection-banner {
+        /* Banner Utama: Status Pembacaan Sensor (Hijau = Sensor Terbaca, Merah = Sensor Tidak Terbaca) */
+        .sensor-banner {
             width: 100%;
             margin-bottom: 24px;
             padding: 15px 22px;
@@ -333,21 +333,24 @@
             box-shadow: 0 8px 24px rgba(27, 67, 50, 0.06);
         }
 
-        .connection-banner.state-checking {
+        .sensor-banner.state-checking {
             background: rgba(254, 240, 199, 0.88);
-            border: 1px solid rgba(217, 119, 6, 0.28);
+            border: 1.5px solid rgba(217, 119, 6, 0.3);
             color: #78350f;
         }
 
-        .connection-banner.state-online {
-            background: rgba(216, 243, 220, 0.92);
-            border: 1.5px solid rgba(45, 106, 79, 0.35);
-            color: #143627;
+        /* Hijau saat sensor terbaca */
+        .sensor-banner.state-readable {
+            background: rgba(209, 250, 229, 0.94);
+            border: 1.5px solid rgba(16, 185, 129, 0.45);
+            color: #065f46;
+            box-shadow: 0 10px 26px rgba(16, 185, 129, 0.12);
         }
 
-        .connection-banner.state-offline {
-            background: rgba(254, 226, 226, 0.94);
-            border: 1.5px solid rgba(220, 38, 38, 0.38);
+        /* Merah saat sensor tidak terbaca */
+        .sensor-banner.state-unreadable {
+            background: rgba(254, 226, 226, 0.95);
+            border: 1.5px solid rgba(220, 38, 38, 0.42);
             color: #991b1b;
             box-shadow: 0 10px 26px rgba(185, 28, 28, 0.12);
         }
@@ -359,13 +362,13 @@
         }
 
         .banner-icon {
-            width: 40px;
-            height: 40px;
+            width: 42px;
+            height: 42px;
             border-radius: 12px;
             display: grid;
             place-items: center;
             flex-shrink: 0;
-            background: rgba(255, 255, 255, 0.72);
+            background: rgba(255, 255, 255, 0.78);
         }
 
         .banner-text h4 {
@@ -378,21 +381,21 @@
         .banner-text p {
             margin: 0;
             font-size: 0.83rem;
-            opacity: 0.9;
+            opacity: 0.92;
             font-weight: 500;
         }
 
         .banner-right-tag {
             font-size: 0.77rem;
             font-weight: 800;
-            padding: 6px 13px;
+            padding: 6px 14px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.72);
+            background: rgba(255, 255, 255, 0.78);
             font-variant-numeric: tabular-nums;
             letter-spacing: 0.3px;
         }
 
-        /* Pop-up Toast Notification */
+        /* Pop-up Toast Notification (Notifikasi Terhubung / Tidak Terhubung saat ESP32 dicolok/dicabut) */
         .toast-container {
             position: fixed;
             top: 20px;
@@ -407,12 +410,12 @@
 
         .toast-alert {
             pointer-events: auto;
-            min-width: 290px;
-            max-width: 370px;
+            min-width: 295px;
+            max-width: 380px;
             padding: 14px 16px;
             border-radius: 16px;
             backdrop-filter: blur(14px);
-            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.14);
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.15);
             display: flex;
             align-items: flex-start;
             gap: 12px;
@@ -420,14 +423,14 @@
         }
 
         .toast-alert.toast-online {
-            background: rgba(236, 253, 245, 0.97);
-            border: 1px solid rgba(16, 185, 129, 0.42);
+            background: rgba(236, 253, 245, 0.98);
+            border: 1.5px solid rgba(16, 185, 129, 0.48);
             color: #065f46;
         }
 
         .toast-alert.toast-offline {
-            background: rgba(254, 242, 242, 0.97);
-            border: 1px solid rgba(239, 68, 68, 0.45);
+            background: rgba(254, 242, 242, 0.98);
+            border: 1.5px solid rgba(239, 68, 68, 0.48);
             color: #991b1b;
         }
 
@@ -436,7 +439,7 @@
         }
 
         .toast-title {
-            font-size: 0.9rem;
+            font-size: 0.92rem;
             font-weight: 800;
             margin: 0 0 2px 0;
         }
@@ -454,7 +457,7 @@
             color: currentColor;
             opacity: 0.6;
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             line-height: 1;
             padding: 0 2px;
         }
@@ -474,11 +477,11 @@
             grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
             gap: 22px;
             width: 100%;
-            transition: opacity 0.35s ease, filter 0.35s ease;
+            transition: opacity 0.35s ease;
         }
 
         .grid-container.device-offline .card {
-            opacity: 0.78;
+            opacity: 0.8;
         }
 
         .card {
@@ -667,7 +670,7 @@
 </head>
 <body>
 
-    <!-- Container Pop-up Toast Notifikasi -->
+    <!-- Container Pop-up Toast Notifikasi ESP32 -->
     <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
     <!-- Efek Pencahayaan Matahari Tropis & Partikel Embun -->
@@ -733,7 +736,7 @@
             <p>Pemantauan Sensor Lingkungan &amp; Navigasi Secara Real-Time</p>
 
             <div class="status-bar">
-                <!-- Indikator Utama: Mobil Terhubung / Mobil Tidak Terhubung -->
+                <!-- Notifikasi Koneksi ESP32: Terhubung / Tidak Terhubung -->
                 <div id="device-indicator" class="device-indicator">
                     <span class="status-dot"></span>
                     <span id="device-status-text">Memeriksa ESP32...</span>
@@ -747,17 +750,17 @@
             </div>
         </header>
 
-        <!-- Banner Status Mobil Terhubung / Tidak Terhubung -->
-        <div id="connection-banner" class="connection-banner state-checking" role="status">
+        <!-- Banner Pembacaan Sensor: Hijau = Sensor Terbaca, Merah = Sensor Tidak Terbaca -->
+        <div id="sensor-banner" class="sensor-banner state-checking" role="status">
             <div class="banner-left">
                 <div id="banner-icon" class="banner-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/>
                     </svg>
                 </div>
                 <div class="banner-text">
-                    <h4 id="banner-title">Memeriksa Sinyal ESP32...</h4>
-                    <p id="banner-desc">Menunggu konfirmasi aliran data aktif dari mikrokontroler mobil RC.</p>
+                    <h4 id="banner-title">Memeriksa Pembacaan Sensor...</h4>
+                    <p id="banner-desc">Menunggu aliran data sensor dari perangkat ESP32.</p>
                 </div>
             </div>
             <div id="banner-tag" class="banner-right-tag">MENGECEK</div>
@@ -791,7 +794,7 @@
                 </div>
 
                 <div class="scale-range">Rentang Ideal: &le; 35&deg;C</div>
-                <div id="status-temp" class="status-badge status-offline">Menunggu ESP32</div>
+                <div id="status-temp" class="status-badge status-offline">Tidak Terbaca</div>
             </section>
 
             <!-- 2. Sensor Kelembapan (DHT22) -->
@@ -821,7 +824,7 @@
                 </div>
 
                 <div class="scale-range">Rentang Ideal: 30% &ndash; 80%</div>
-                <div id="status-hum" class="status-badge status-offline">Menunggu ESP32</div>
+                <div id="status-hum" class="status-badge status-offline">Tidak Terbaca</div>
             </section>
 
             <!-- 3. Sensor Gas (MQ-2) -->
@@ -853,7 +856,7 @@
                 </div>
 
                 <div class="scale-range">Ambang Bahaya: &gt; 1500 ADC</div>
-                <div id="status-gas" class="status-badge status-offline">Menunggu ESP32</div>
+                <div id="status-gas" class="status-badge status-offline">Tidak Terbaca</div>
             </section>
 
             <!-- 4. Sensor Jarak (HC-SR04) -->
@@ -884,7 +887,7 @@
                 </div>
 
                 <div class="scale-range">Batas Aman: &ge; 15 cm</div>
-                <div id="status-dist" class="status-badge status-offline">Menunggu ESP32</div>
+                <div id="status-dist" class="status-badge status-offline">Tidak Terbaca</div>
             </section>
         </main>
     </div>
@@ -917,33 +920,33 @@
         setInterval(updateRealtimeClock, 1000);
 
         // ==========================================
-        // 2. LOGIKA DETEKSI ESP32 (MENYALA / MATI)
+        // 2. LOGIKA KONEKSI ESP32 & PEMBACAAN SENSOR
         // ==========================================
         const FIREBASE_URL = "https://rc-telementri-default-rtdb.asia-southeast1.firebasedatabase.app";
         const FIREBASE_AUTH = "y4KdPtOZOokvMWl8qdZuSUpeOla0NAXgQsOW5a02";
         const DB_PATH = "/Sensor.json";
         const streamUrl = `${FIREBASE_URL}${DB_PATH}?auth=${FIREBASE_AUTH}`;
 
-        const INITIAL_VERIFY_MS = 4000;   // Waktu verifikasi awal (4 detik)
-        const OFFLINE_TIMEOUT_MS = 8000;  // Jika 8 detik tidak ada data baru -> ESP32 Mati
+        const INITIAL_VERIFY_MS = 3500;   // Verifikasi awal saat web dibuka (3.5 detik)
+        const OFFLINE_TIMEOUT_MS = 7000;  // Jika 7 detik tidak ada data baru -> Tidak Terhubung
 
-        let sensorData = { Suhu: 0, Kelembapan: 0, Gas: 0, Jarak: 0 };
-        let baselineSnapshot = null;      // Menyimpan snapshot awal saat web dibuka
-        let isCarOnline = null;           // null = mengecek, true = ESP32 menyala, false = ESP32 mati
-        let lastActiveTime = null;
+        let sensorData = { Suhu: null, Kelembapan: null, Gas: null, Jarak: null };
+        let initialPacketSkipped = false; // Paket pertama dari Firebase SSE adalah cache lama
+        let isEspConnected = null;        // null = mengecek, true = terhubung, false = tidak terhubung
         let watchdogTimer = null;
         let simInterval = null;
 
         const deviceIndicator = document.getElementById('device-indicator');
         const deviceStatusText = document.getElementById('device-status-text');
         const lastUpdateText = document.getElementById('last-update');
-        const bannerEl = document.getElementById('connection-banner');
+        const bannerEl = document.getElementById('sensor-banner');
         const bannerIcon = document.getElementById('banner-icon');
         const bannerTitle = document.getElementById('banner-title');
         const bannerDesc = document.getElementById('banner-desc');
         const bannerTag = document.getElementById('banner-tag');
         const sensorGrid = document.getElementById('sensor-grid');
 
+        // Pop-up Toast Notifikasi (Notifikasi Terhubung / Tidak Terhubung)
         function showToast(type, title, description) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -975,55 +978,79 @@
             }, 5500);
         }
 
-        // Atur Tampilan Website: ESP32 Menyala -> "Mobil Terhubung", ESP32 Mati -> "Mobil Tidak Terhubung"
-        function setCarConnectionState(online) {
-            const stateChanged = isCarOnline !== online;
-            isCarOnline = online;
+        // Cek apakah nilai sensor valid dan terbaca
+        function isValidNumber(val) {
+            return val !== null && val !== undefined && val !== "" && Number.isFinite(Number(val));
+        }
 
-            if (online) {
-                deviceIndicator.className = "device-indicator online";
-                deviceStatusText.textContent = "Mobil Terhubung";
+        function areSensorsReadable() {
+            return isValidNumber(sensorData.Suhu) &&
+                   isValidNumber(sensorData.Kelembapan) &&
+                   isValidNumber(sensorData.Gas) &&
+                   isValidNumber(sensorData.Jarak);
+        }
 
-                bannerEl.className = "connection-banner state-online";
+        // Update Banner Pembacaan Sensor: Hijau = Sensor Terbaca, Merah = Sensor Tidak Terbaca
+        function updateSensorBanner(readable) {
+            if (readable) {
+                bannerEl.className = "sensor-banner state-readable";
                 bannerIcon.innerHTML = `
-                    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#1b4332" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
                     </svg>`;
-                bannerTitle.textContent = "Mobil Terhubung";
-                bannerDesc.textContent = simInterval
-                    ? "Mode simulasi aktif — menampilkan data sensor secara real-time."
-                    : "ESP32 menyala dan aktif mengirimkan data sensor ke website.";
-                bannerTag.textContent = "ESP32 MENYALA";
+                bannerTitle.textContent = "Sensor Terbaca";
+                bannerDesc.textContent = "Data sensor DHT22, MQ-2, dan HC-SR04 aktif terbaca secara real-time.";
+                bannerTag.textContent = "SENSOR AKTIF";
                 sensorGrid.classList.remove("device-offline");
+            } else {
+                bannerEl.className = "sensor-banner state-unreadable";
+                bannerIcon.innerHTML = `
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>`;
+                bannerTitle.textContent = "Sensor Tidak Terbaca";
+                bannerDesc.textContent = isEspConnected
+                    ? "ESP32 terhubung, namun nilai sensor belum terbaca / bernilai kosong."
+                    : "Tidak ada pembacaan sensor karena ESP32 tidak terhubung atau dalam keadaan mati.";
+                bannerTag.textContent = "TIDAK TERBACA";
+                sensorGrid.classList.add("device-offline");
+            }
+        }
+
+        // Update Status Koneksi ESP32 (Saat Dicolokkan -> Notifikasi Terhubung, Sebaliknya -> Tidak Terhubung)
+        function setEspConnectionState(connected) {
+            const stateChanged = isEspConnected !== connected;
+            isEspConnected = connected;
+
+            if (connected) {
+                deviceIndicator.className = "device-indicator online";
+                deviceStatusText.textContent = "Notifikasi: Terhubung";
+
+                const readable = areSensorsReadable();
+                updateSensorBanner(readable);
 
                 if (stateChanged) {
                     showToast(
                         'online',
-                        'Mobil Terhubung',
-                        'ESP32 menyala dan terhubung ke sistem telemetri.'
+                        'Notifikasi: Terhubung',
+                        'ESP32 berhasil dicolokkan dan terhubung ke website.'
                     );
                 }
             } else {
                 deviceIndicator.className = "device-indicator offline";
-                deviceStatusText.textContent = "Mobil Tidak Terhubung";
+                deviceStatusText.textContent = "Notifikasi: Tidak Terhubung";
 
-                bannerEl.className = "connection-banner state-offline";
-                bannerIcon.innerHTML = `
-                    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
-                    </svg>`;
-                bannerTitle.textContent = "Mobil Tidak Terhubung";
-                bannerDesc.textContent = "ESP32 dalam keadaan mati atau tidak ada sinyal data yang masuk.";
-                bannerTag.textContent = "ESP32 MATI";
-                sensorGrid.classList.add("device-offline");
-
+                updateSensorBanner(false);
                 resetGaugesToOffline();
 
                 if (stateChanged) {
                     showToast(
                         'offline',
-                        'Mobil Tidak Terhubung',
-                        'ESP32 mati atau terputus. Nyalakan daya mobil RC untuk memulai pemantauan.'
+                        'Notifikasi: Tidak Terhubung',
+                        'ESP32 terputus atau belum dicolokkan. Periksa daya perangkat.'
                     );
                 }
             }
@@ -1033,7 +1060,7 @@
             clearTimeout(watchdogTimer);
             watchdogTimer = setTimeout(() => {
                 if (!simInterval) {
-                    setCarConnectionState(false);
+                    setEspConnectionState(false);
                 }
             }, timeoutMs);
         }
@@ -1044,14 +1071,14 @@
         const eventSource = new EventSource(streamUrl);
 
         eventSource.onopen = () => {
-            if (!simInterval && isCarOnline === null) {
+            if (!simInterval && isEspConnected === null) {
                 resetWatchdog(INITIAL_VERIFY_MS);
             }
         };
 
         eventSource.onerror = () => {
             if (!simInterval) {
-                setCarConnectionState(false);
+                setEspConnectionState(false);
             }
         };
 
@@ -1066,45 +1093,32 @@
                 const payload = JSON.parse(event.data);
                 if (!payload || payload.data === undefined) return;
 
-                // Snapshot awal saat browser baru terhubung ke Firebase
-                if (payload.path === "/" && baselineSnapshot === null) {
-                    baselineSnapshot = JSON.stringify(payload.data);
+                // Paket pertama saat browser baru dibuka adalah data cache lama di server Firebase.
+                // Paket-paket setelahnya adalah sinyal live langsung saat ESP32 dicolokkan & mengirim data.
+                if (payload.path === "/" && !initialPacketSkipped) {
+                    initialPacketSkipped = true;
                     if (payload.data && typeof payload.data === "object") {
                         sensorData = { ...sensorData, ...payload.data };
                     }
-                    // Tunggu INITIAL_VERIFY_MS untuk melihat apakah ESP32 benar-benar sedang mengirim data baru
                     resetWatchdog(INITIAL_VERIFY_MS);
                     return;
                 }
 
-                // Cek apakah ada data baru yang masuk dari ESP32
-                let isLiveUpdate = false;
-
                 if (payload.path === "/") {
-                    const currentSnapshot = JSON.stringify(payload.data);
-                    if (currentSnapshot !== baselineSnapshot) {
-                        baselineSnapshot = currentSnapshot;
-                        if (payload.data && typeof payload.data === "object") {
-                            sensorData = { ...sensorData, ...payload.data };
-                        }
-                        isLiveUpdate = true;
+                    if (payload.data && typeof payload.data === "object") {
+                        sensorData = { ...sensorData, ...payload.data };
                     }
                 } else {
                     const key = payload.path.replace(/^\//, "");
                     if (key in sensorData) {
                         sensorData[key] = payload.data;
                     }
-                    // Mendukung key tambahan seperti heartbeat / uptime / timestamp dari ESP32
-                    isLiveUpdate = true;
                 }
 
-                if (isLiveUpdate) {
-                    lastActiveTime = new Date();
-                    lastUpdateText.textContent = `Update Data: ${formatTime24(lastActiveTime)}`;
-                    setCarConnectionState(true);
-                    updateDashboard();
-                    resetWatchdog(OFFLINE_TIMEOUT_MS);
-                }
+                lastUpdateText.textContent = `Update Data: ${formatTime24(new Date())}`;
+                setEspConnectionState(true);
+                updateDashboard();
+                resetWatchdog(OFFLINE_TIMEOUT_MS);
             } catch (error) {
                 console.error("Gagal mem-parsing data Firebase:", error);
             }
@@ -1132,17 +1146,31 @@
                 }
                 if (textVal) textVal.textContent = '--';
                 if (badgeEl) {
-                    badgeEl.textContent = 'ESP32 Mati';
+                    badgeEl.textContent = 'Tidak Terbaca';
                     badgeEl.className = 'status-badge status-offline';
                 }
             });
         }
 
+        function setSingleSensorUnreadable(idPrefix, badgeId) {
+            const circle = document.getElementById(`circle-${idPrefix}`);
+            const textVal = document.getElementById(`val-${idPrefix}`);
+            const badgeEl = document.getElementById(badgeId);
+
+            if (circle) {
+                circle.setAttribute('stroke-dasharray', '0, 100');
+                circle.style.stroke = '';
+            }
+            if (textVal) textVal.textContent = '--';
+            if (badgeEl) {
+                badgeEl.textContent = 'Tidak Terbaca';
+                badgeEl.className = 'status-badge status-offline';
+            }
+        }
+
         function updateGauge(idPrefix, rawValue, min, max, alertColor = null) {
             const value = Number(rawValue);
-            const safeValue = Number.isFinite(value) ? value : 0;
-
-            let percentage = ((safeValue - min) / (max - min)) * 100;
+            let percentage = ((value - min) / (max - min)) * 100;
             percentage = Math.min(100, Math.max(0, percentage));
 
             const circle = document.getElementById(`circle-${idPrefix}`);
@@ -1151,67 +1179,84 @@
             if (circle && textVal) {
                 circle.setAttribute('stroke-dasharray', `${percentage.toFixed(1)}, 100`);
                 circle.style.stroke = alertColor ? alertColor : "";
-                textVal.textContent = Number.isInteger(safeValue)
-                    ? safeValue
-                    : safeValue.toFixed(1);
+                textVal.textContent = Number.isInteger(value) ? value : value.toFixed(1);
             }
 
-            return safeValue;
+            return value;
         }
 
         function updateDashboard() {
-            if (isCarOnline === false) return;
+            if (isEspConnected === false) return;
 
             // 1. DHT22 Suhu (0 - 50 °C)
-            const isOverheat = Number(sensorData.Suhu) > 35;
-            updateGauge('temp', sensorData.Suhu, 0, 50, isOverheat ? "#dc2626" : null);
-            const badgeTemp = document.getElementById('status-temp');
-            if (isOverheat) {
-                badgeTemp.textContent = "Overheat!";
-                badgeTemp.className = "status-badge status-danger";
+            if (!isValidNumber(sensorData.Suhu)) {
+                setSingleSensorUnreadable('temp', 'status-temp');
             } else {
-                badgeTemp.textContent = "Suhu Aman";
-                badgeTemp.className = "status-badge";
+                const suhuVal = Number(sensorData.Suhu);
+                const isOverheat = suhuVal > 35;
+                updateGauge('temp', suhuVal, 0, 50, isOverheat ? "#dc2626" : null);
+                const badgeTemp = document.getElementById('status-temp');
+                if (isOverheat) {
+                    badgeTemp.textContent = "Overheat!";
+                    badgeTemp.className = "status-badge status-danger";
+                } else {
+                    badgeTemp.textContent = "Suhu Aman";
+                    badgeTemp.className = "status-badge";
+                }
             }
 
             // 2. DHT22 Kelembapan (0 - 100 %)
-            const humVal = Number(sensorData.Kelembapan);
-            const isHumWarn = humVal > 80 || humVal < 30;
-            updateGauge('hum', sensorData.Kelembapan, 0, 100, isHumWarn ? "#d97706" : null);
-            const badgeHum = document.getElementById('status-hum');
-            if (humVal > 80) {
-                badgeHum.textContent = "Terlalu Lembap";
-                badgeHum.className = "status-badge status-warning";
-            } else if (humVal < 30) {
-                badgeHum.textContent = "Udara Kering";
-                badgeHum.className = "status-badge status-warning";
+            if (!isValidNumber(sensorData.Kelembapan)) {
+                setSingleSensorUnreadable('hum', 'status-hum');
             } else {
-                badgeHum.textContent = "Normal";
-                badgeHum.className = "status-badge";
+                const humVal = Number(sensorData.Kelembapan);
+                const isHumWarn = humVal > 80 || humVal < 30;
+                updateGauge('hum', humVal, 0, 100, isHumWarn ? "#d97706" : null);
+                const badgeHum = document.getElementById('status-hum');
+                if (humVal > 80) {
+                    badgeHum.textContent = "Terlalu Lembap";
+                    badgeHum.className = "status-badge status-warning";
+                } else if (humVal < 30) {
+                    badgeHum.textContent = "Udara Kering";
+                    badgeHum.className = "status-badge status-warning";
+                } else {
+                    badgeHum.textContent = "Normal";
+                    badgeHum.className = "status-badge";
+                }
             }
 
             // 3. MQ-2 Gas / Asap (ADC ESP32: 0 - 4095)
-            const isGasDanger = Number(sensorData.Gas) > 1500;
-            updateGauge('gas', sensorData.Gas, 0, 4095, isGasDanger ? "#dc2626" : null);
-            const badgeGas = document.getElementById('status-gas');
-            if (isGasDanger) {
-                badgeGas.textContent = "Deteksi Gas / Asap!";
-                badgeGas.className = "status-badge status-danger";
+            if (!isValidNumber(sensorData.Gas)) {
+                setSingleSensorUnreadable('gas', 'status-gas');
             } else {
-                badgeGas.textContent = "Udara Bersih";
-                badgeGas.className = "status-badge";
+                const gasVal = Number(sensorData.Gas);
+                const isGasDanger = gasVal > 1500;
+                updateGauge('gas', gasVal, 0, 4095, isGasDanger ? "#dc2626" : null);
+                const badgeGas = document.getElementById('status-gas');
+                if (isGasDanger) {
+                    badgeGas.textContent = "Deteksi Gas / Asap!";
+                    badgeGas.className = "status-badge status-danger";
+                } else {
+                    badgeGas.textContent = "Udara Bersih";
+                    badgeGas.className = "status-badge";
+                }
             }
 
             // 4. HC-SR04 Jarak Rintangan (0 - 200 CM)
-            const isCollisionDanger = Number(sensorData.Jarak) < 15;
-            updateGauge('dist', sensorData.Jarak, 0, 200, isCollisionDanger ? "#dc2626" : null);
-            const badgeDist = document.getElementById('status-dist');
-            if (isCollisionDanger) {
-                badgeDist.textContent = "Awas Tabrakan!";
-                badgeDist.className = "status-badge status-danger";
+            if (!isValidNumber(sensorData.Jarak)) {
+                setSingleSensorUnreadable('dist', 'status-dist');
             } else {
-                badgeDist.textContent = "Jalan Aman";
-                badgeDist.className = "status-badge";
+                const distVal = Number(sensorData.Jarak);
+                const isCollisionDanger = distVal < 15;
+                updateGauge('dist', distVal, 0, 200, isCollisionDanger ? "#dc2626" : null);
+                const badgeDist = document.getElementById('status-dist');
+                if (isCollisionDanger) {
+                    badgeDist.textContent = "Awas Tabrakan!";
+                    badgeDist.className = "status-badge status-danger";
+                } else {
+                    badgeDist.textContent = "Jalan Aman";
+                    badgeDist.className = "status-badge";
+                }
             }
         }
 
@@ -1225,7 +1270,7 @@
                 simInterval = null;
                 btn.textContent = "Mode Simulasi: Off";
                 btn.classList.remove("active");
-                setCarConnectionState(false);
+                setEspConnectionState(false);
             } else {
                 clearTimeout(watchdogTimer);
                 btn.textContent = "Mode Simulasi: On";
@@ -1239,7 +1284,7 @@
                         Jarak: Math.floor(10 + Math.random() * 140)
                     };
                     lastUpdateText.textContent = `Update Data: ${formatTime24()}`;
-                    setCarConnectionState(true);
+                    setEspConnectionState(true);
                     updateDashboard();
                 };
                 runStep();
