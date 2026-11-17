@@ -3,20 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Telemetri Mobil RC</title>
+    <title>Sistem Telemetri Mobil RC • Tropical Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #181416;
-            --card-bg: #241e21;
-            --card-border: #3a2d33;
-            --text-light: #FFF0F5;
-            --text-muted: #C4A7B3;
-            --pink-main: #FF69B4;
-            --pink-light: #3b2b32;
-            --pink-dark: #FF85C1;
-            --safe-color: #2ED573;
-            --warn-color: #FFA502;
-            --danger-color: #FF4757;
+            --bg-top: #eef8f2;
+            --bg-mid: #dff2e7;
+            --bg-bottom: #cde7d8;
+            --card-bg: rgba(255, 255, 255, 0.78);
+            --card-border: rgba(45, 106, 79, 0.16);
+            --card-shadow: 0 14px 34px rgba(27, 67, 50, 0.08);
+            --text-dark: #143627;
+            --text-muted: #4b7361;
+            --leaf-deep: #1b4332;
+            --leaf-main: #2d6a4f;
+            --leaf-fresh: #40916c;
+            --leaf-mint: #74c69d;
+            --track-ring: rgba(45, 106, 79, 0.12);
+            --safe-bg: #d8f3dc;
+            --safe-text: #1b4332;
+            --warn-bg: #fef0c7;
+            --warn-text: #92400e;
+            --danger-bg: #fee2e2;
+            --danger-text: #b91c1c;
         }
 
         * {
@@ -24,33 +35,157 @@
         }
 
         body {
-            background-color: var(--bg-color);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: var(--text-light);
+            background: linear-gradient(155deg, var(--bg-top) 0%, var(--bg-mid) 52%, var(--bg-bottom) 100%);
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            color: var(--text-dark);
             margin: 0;
-            padding: 24px 16px;
+            padding: 32px 18px 48px;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Efek Cahaya Matahari Pagi Tropis */
+        .sunbeam-glow {
+            position: fixed;
+            top: -140px;
+            right: -120px;
+            width: 520px;
+            height: 520px;
+            background: radial-gradient(circle, rgba(253, 230, 138, 0.42) 0%, rgba(116, 198, 157, 0.12) 45%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Dekorasi Dedaunan Sudut (Bergerak Lembut Tertiup Angin) */
+        .foliage-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .leaf-decor {
+            position: absolute;
+            opacity: 0.22;
+            transform-origin: bottom left;
+            animation: tropicalBreeze 7s ease-in-out infinite alternate;
+        }
+
+        .leaf-top-left {
+            top: -25px;
+            left: -30px;
+            width: 280px;
+            transform-origin: top left;
+            animation-duration: 8s;
+        }
+
+        .leaf-bottom-right {
+            bottom: -35px;
+            right: -25px;
+            width: 320px;
+            transform-origin: bottom right;
+            animation-duration: 9.5s;
+            animation-delay: -2s;
+        }
+
+        .leaf-bottom-left {
+            bottom: -20px;
+            left: -20px;
+            width: 210px;
+            opacity: 0.15;
+            transform-origin: bottom left;
+            animation-duration: 6.5s;
+            animation-delay: -1s;
+        }
+
+        @keyframes tropicalBreeze {
+            0%   { transform: rotate(-2deg) scale(1); }
+            50%  { transform: rotate(2.5deg) scale(1.02); }
+            100% { transform: rotate(-1deg) scale(0.99); }
+        }
+
+        /* Partikel Embun / Cahaya Hutan Melayang */
+        .dew-particles span {
+            position: fixed;
+            bottom: -20px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.85), rgba(116, 198, 157, 0.35));
+            pointer-events: none;
+            z-index: 0;
+            animation: floatDew 14s linear infinite;
+        }
+
+        .dew-particles span:nth-child(1) { left: 12%; width: 7px; height: 7px; animation-duration: 13s; animation-delay: 0s; }
+        .dew-particles span:nth-child(2) { left: 28%; width: 11px; height: 11px; animation-duration: 17s; animation-delay: 3s; }
+        .dew-particles span:nth-child(3) { left: 52%; width: 6px; height: 6px; animation-duration: 12s; animation-delay: 6s; }
+        .dew-particles span:nth-child(4) { left: 74%; width: 10px; height: 10px; animation-duration: 16s; animation-delay: 2s; }
+        .dew-particles span:nth-child(5) { left: 89%; width: 8px; height: 8px; animation-duration: 15s; animation-delay: 5s; }
+
+        @keyframes floatDew {
+            0% {
+                transform: translateY(0) translateX(0) scale(0.8);
+                opacity: 0;
+            }
+            20% { opacity: 0.75; }
+            80% { opacity: 0.5; }
+            100% {
+                transform: translateY(-105vh) translateX(28px) scale(1.15);
+                opacity: 0;
+            }
+        }
+
+        /* Konten Utama */
+        .main-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 34px;
+            max-width: 680px;
+        }
+
+        .brand-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 999px;
+            background: rgba(45, 106, 79, 0.1);
+            border: 1px solid rgba(45, 106, 79, 0.18);
+            color: var(--leaf-main);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
         }
 
         .header h1 {
-            color: var(--pink-dark);
-            margin: 0 0 6px 0;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-size: 1.8em;
+            color: var(--leaf-deep);
+            margin: 0 0 8px 0;
+            font-size: clamp(1.65rem, 3vw, 2.25rem);
+            font-weight: 800;
+            letter-spacing: -0.5px;
         }
 
         .header p {
             color: var(--text-muted);
-            margin: 0 0 14px 0;
+            margin: 0 0 18px 0;
+            font-size: 0.95rem;
             font-weight: 500;
         }
 
@@ -63,325 +198,174 @@
         }
 
         .connection-status {
-            display: inline-block;
-            padding: 6px 16px;
-            background-color: var(--warn-color);
-            color: #181416;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 16px;
+            background-color: var(--warn-bg);
+            color: var(--warn-text);
+            border: 1px solid rgba(217, 119, 6, 0.25);
+            border-radius: 999px;
+            font-size: 0.83rem;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(27, 67, 50, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: currentColor;
+            animation: blinkDot 1.6s infinite ease-in-out;
+        }
+
+        @keyframes blinkDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.75); }
         }
 
         .last-update {
-            font-size: 0.82em;
+            font-size: 0.83rem;
             color: var(--text-muted);
             background: var(--card-bg);
+            backdrop-filter: blur(10px);
             border: 1px solid var(--card-border);
-            padding: 6px 14px;
-            border-radius: 20px;
+            padding: 7px 15px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
         }
 
+        .sim-btn {
+            font-family: inherit;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--leaf-main);
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(45, 106, 79, 0.28);
+            padding: 7px 15px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .sim-btn:hover {
+            background: var(--leaf-main);
+            color: #ffffff;
+        }
+
+        .sim-btn.active {
+            background: var(--leaf-deep);
+            color: #d8f3dc;
+            border-color: var(--leaf-deep);
+        }
+
+        /* Grid Kartu Sensor */
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
             gap: 22px;
             width: 100%;
-            max-width: 1040px;
         }
 
         .card {
+            position: relative;
             background: var(--card-bg);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 24px 18px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+            border-radius: 24px;
+            padding: 22px 20px 24px;
+            box-shadow: var(--card-shadow);
             text-align: center;
-            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+                        box-shadow 0.3s ease,
+                        border-color 0.3s ease;
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--pink-main);
-            box-shadow: 0 14px 30px rgba(255, 105, 180, 0.2);
+            transform: translateY(-6px);
+            border-color: rgba(64, 145, 108, 0.45);
+            box-shadow: 0 18px 38px rgba(27, 67, 50, 0.14);
+        }
+
+        /* Watermark Urats Daun Halus di Sudut Kartu */
+        .card-leaf-watermark {
+            position: absolute;
+            bottom: -14px;
+            right: -14px;
+            width: 95px;
+            height: 95px;
+            opacity: 0.06;
+            pointer-events: none;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        .card:hover .card-leaf-watermark {
+            transform: rotate(-8deg) scale(1.08);
+            opacity: 0.11;
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .card-title-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-align: left;
+        }
+
+        .sensor-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: rgba(64, 145, 108, 0.12);
+            color: var(--leaf-main);
+            flex-shrink: 0;
         }
 
         .card h3 {
-            margin: 0 0 16px 0;
-            color: var(--pink-dark);
-            font-size: 1.1em;
-            letter-spacing: 0.4px;
+            margin: 0;
+            color: var(--leaf-deep);
+            font-size: 0.98rem;
+            font-weight: 700;
+            line-height: 1.25;
         }
 
-        /* Desain Indikator Melingkar (SVG) */
+        .sensor-chip {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: rgba(45, 106, 79, 0.08);
+            padding: 3px 8px;
+            border-radius: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        /* Indikator Melingkar (SVG) */
+        .gauge-wrapper {
+            position: relative;
+            margin: 6px auto 8px;
+            width: 168px;
+            height: 168px;
+        }
+
         .circular-chart {
             display: block;
-            margin: 0 auto;
-            max-width: 175px;
-            max-height: 175px;
+            width: 100%;
+            height: 100%;
         }
 
         .circle-bg {
             fill: none;
-            stroke: var(--pink-light);
-            stroke-width: 3.6;
-        }
-
-        .circle {
-            fill: none;
-            stroke-width: 3.2;
-            stroke-linecap: round;
-            transition: stroke-dasharray 0.6s ease-out, stroke 0.3s ease;
-        }
-
-        /* Warna spesifik tiap sensor */
-        .color-temp { stroke: #FF7675; }
-        .color-hum  { stroke: #74B9FF; }
-        .color-gas  { stroke: var(--pink-main); }
-        .color-dist { stroke: #A29BFE; }
-
-        .percentage {
-            fill: var(--text-light);
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 0.46em;
-            text-anchor: middle;
-            font-weight: bold;
-        }
-
-        .sensor-label {
-            fill: var(--text-muted);
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 0.19em;
-            text-anchor: middle;
-            font-weight: 500;
-        }
-
-        .status-badge {
-            display: inline-block;
-            margin-top: 16px;
-            padding: 6px 15px;
-            border-radius: 15px;
-            font-size: 0.85em;
-            font-weight: bold;
-            color: #181416;
-            background-color: var(--safe-color);
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .status-warning {
-            background-color: var(--warn-color);
-            color: #181416;
-        }
-
-        .status-danger {
-            background-color: var(--danger-color);
-            color: #FFFFFF;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0%   { transform: scale(1); }
-            50%  { transform: scale(1.06); }
-            100% { transform: scale(1); }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="header">
-        <h1>Dashboard RC Car</h1>
-        <p>IoT Telemetry Monitor &bull; ESP32</p>
-        <div class="status-bar">
-            <div id="conn-status" class="connection-status">Menghubungkan ke Firebase...</div>
-            <div id="last-update" class="last-update">Menunggu data...</div>
-        </div>
-    </div>
-
-    <div class="grid-container">
-        <!-- Sensor Suhu (DHT22) -->
-        <div class="card">
-            <h3>Suhu Lingkungan</h3>
-            <svg viewBox="0 0 36 36" class="circular-chart">
-                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                <path class="circle color-temp" id="circle-temp" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                <text x="18" y="18.5" class="percentage" id="val-temp">0</text>
-                <text x="18" y="24" class="sensor-label">&deg;C</text>
-            </svg>
-            <div id="status-temp" class="status-badge">Suhu Aman</div>
-        </div>
-
-        <!-- Sensor Kelembapan (DHT22) -->
-        <div class="card">
-            <h3>Kelembapan Udara</h3>
-            <svg viewBox="0 0 36 36" class="circular-chart">
-                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                <path class="circle color-hum" id="circle-hum" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                <text x="18" y="18.5" class="percentage" id="val-hum">0</text>
-                <text x="18" y="24" class="sensor-label">%</text>
-            </svg>
-            <div id="status-hum" class="status-badge">Normal</div>
-        </div>
-
-        <!-- Sensor Gas (MQ-2) -->
-        <div class="card">
-            <h3>Kadar Gas / Asap (MQ-2)</h3>
-            <svg viewBox="0 0 36 36" class="circular-chart">
-                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                <path class="circle color-gas" id="circle-gas" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                <text x="18" y="18.5" class="percentage" id="val-gas">0</text>
-                <text x="18" y="24" class="sensor-label">Raw ADC</text>
-            </svg>
-            <div id="status-gas" class="status-badge">Udara Bersih</div>
-        </div>
-
-        <!-- Sensor Jarak (HC-SR04) -->
-        <div class="card">
-            <h3>Jarak Rintangan</h3>
-            <svg viewBox="0 0 36 36" class="circular-chart">
-                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                <path class="circle color-dist" id="circle-dist" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                <text x="18" y="18.5" class="percentage" id="val-dist">0</text>
-                <text x="18" y="24" class="sensor-label">CM</text>
-            </svg>
-            <div id="status-dist" class="status-badge">Jalan Aman</div>
-        </div>
-    </div>
-
-    <script>
-        // Konfigurasi Firebase Realtime Database
-        const FIREBASE_URL = "https://rc-telementri-default-rtdb.asia-southeast1.firebasedatabase.app";
-        const FIREBASE_AUTH = "y4KdPtOZOokvMWl8qdZuSUpeOla0NAXgQsOW5a02";
-        const DB_PATH = "/Sensor.json";
-
-        const streamUrl = `${FIREBASE_URL}${DB_PATH}?auth=${FIREBASE_AUTH}`;
-
-        // State data sensor
-        let sensorData = { Suhu: 0, Kelembapan: 0, Gas: 0, Jarak: 0 };
-        let hasReceivedData = false;
-
-        const statusText = document.getElementById('conn-status');
-        const lastUpdateText = document.getElementById('last-update');
-        const eventSource = new EventSource(streamUrl);
-
-        eventSource.onopen = () => {
-            statusText.textContent = "Terhubung Real-Time";
-            statusText.style.backgroundColor = "#2ED573";
-            statusText.style.color = "#181416";
-        };
-
-        eventSource.onerror = (err) => {
-            console.error("EventSource error:", err);
-            statusText.textContent = "Koneksi Terputus / Mencoba Ulang...";
-            statusText.style.backgroundColor = "#FF4757";
-            statusText.style.color = "#FFFFFF";
-        };
-
-        eventSource.addEventListener('put', handleFirebaseData);
-        eventSource.addEventListener('patch', handleFirebaseData);
-
-        function handleFirebaseData(event) {
-            if (!event.data || event.data === "null") return;
-
-            try {
-                const payload = JSON.parse(event.data);
-                if (!payload || payload.data === undefined) return;
-
-                if (payload.path === "/") {
-                    if (payload.data && typeof payload.data === "object") {
-                        sensorData = { ...sensorData, ...payload.data };
-                        hasReceivedData = true;
-                    }
-                } else {
-                    const key = payload.path.replace(/^\//, "");
-                    if (key in sensorData) {
-                        sensorData[key] = payload.data;
-                        hasReceivedData = true;
-                    }
-                }
-
-                const now = new Date().toLocaleTimeString('id-ID');
-                lastUpdateText.textContent = `Update: ${now}`;
-                updateDashboard();
-            } catch (error) {
-                console.error("Gagal mem-parsing data Firebase:", error);
-            }
-        }
-
-        // Fungsi pembaruan Indikator Visual (Gauges)
-        function updateGauge(idPrefix, rawValue, min, max) {
-            const value = Number(rawValue);
-            const safeValue = Number.isFinite(value) ? value : 0;
-
-            let percentage = ((safeValue - min) / (max - min)) * 100;
-            percentage = Math.min(100, Math.max(0, percentage));
-
-            const circle = document.getElementById(`circle-${idPrefix}`);
-            const textVal = document.getElementById(`val-${idPrefix}`);
-
-            if (circle && textVal) {
-                circle.setAttribute('stroke-dasharray', `${percentage.toFixed(1)}, 100`);
-                textVal.textContent = Number.isInteger(safeValue)
-                    ? safeValue
-                    : safeValue.toFixed(1);
-            }
-
-            return safeValue;
-        }
-
-        // Fungsi evaluasi status sensor
-        function updateDashboard() {
-            // 1. DHT22 Suhu (0 - 50 °C)
-            const suhu = updateGauge('temp', sensorData.Suhu, 0, 50);
-            const badgeTemp = document.getElementById('status-temp');
-            if (suhu > 35) {
-                badgeTemp.textContent = "Overheat!";
-                badgeTemp.className = "status-badge status-danger";
-            } else {
-                badgeTemp.textContent = "Suhu Aman";
-                badgeTemp.className = "status-badge";
-            }
-
-            // 2. DHT22 Kelembapan (0 - 100 %)
-            const hum = updateGauge('hum', sensorData.Kelembapan, 0, 100);
-            const badgeHum = document.getElementById('status-hum');
-            if (hum > 80) {
-                badgeHum.textContent = "Terlalu Lembap";
-                badgeHum.className = "status-badge status-warning";
-            } else if (hum < 30 && hasReceivedData) {
-                badgeHum.textContent = "Udara Kering";
-                badgeHum.className = "status-badge status-warning";
-            } else {
-                badgeHum.textContent = "Normal";
-                badgeHum.className = "status-badge";
-            }
-
-            // 3. MQ-2 Gas / Asap (ADC ESP32: 0 - 4095)
-            const gas = updateGauge('gas', sensorData.Gas, 0, 4095);
-            const badgeGas = document.getElementById('status-gas');
-            if (gas > 1500) {
-                badgeGas.textContent = "Deteksi Gas / Asap!";
-                badgeGas.className = "status-badge status-danger";
-            } else {
-                badgeGas.textContent = "Udara Bersih";
-                badgeGas.className = "status-badge";
-            }
-
-            // 4. HC-SR04 Jarak Rintangan (0 - 200 CM)
-            const jarak = updateGauge('dist', sensorData.Jarak, 0, 200);
-            const badgeDist = document.getElementById('status-dist');
-            if (hasReceivedData && jarak < 15) {
-                badgeDist.textContent = "Awas Tabrakan!";
-                badgeDist.className = "status-badge status-danger";
-            } else {
-                badgeDist.textContent = "Jalan Aman";
-                badgeDist.className = "status-badge";
-            }
-        }
-
-        // Tutup koneksi stream saat tab ditutup
-        window.addEventListener('beforeunload', () => {
-            eventSource.close();
-        });
-    </script>
-</body>
-</html>
+            stroke: var(--track-ring);
+            stroke-width:
