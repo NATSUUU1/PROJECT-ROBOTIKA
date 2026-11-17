@@ -27,7 +27,14 @@ jobs:
       - name: Siapkan folder dist
         run: |
           mkdir -p dist
-          cp "gemini-code-1794883496342.html" dist/index.html
+          # Cari file .html terbaru yang diubah di repo (selain README)
+          LATEST_HTML=$(ls -t *.html 2>/dev/null | head -n 1)
+          if [ -z "$LATEST_HTML" ]; then
+            echo "Tidak ada file .html ditemukan di root repo!"
+            exit 1
+          fi
+          echo "Menggunakan file: $LATEST_HTML"
+          cp "$LATEST_HTML" dist/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
