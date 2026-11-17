@@ -12,7 +12,7 @@
             --bg-top: #eef8f2;
             --bg-mid: #dff2e7;
             --bg-bottom: #cde7d8;
-            --card-bg: rgba(255, 255, 255, 0.78);
+            --card-bg: rgba(255, 255, 255, 0.8);
             --card-border: rgba(45, 106, 79, 0.16);
             --card-shadow: 0 14px 34px rgba(27, 67, 50, 0.08);
             --text-dark: #143627;
@@ -39,7 +39,7 @@
             font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
             color: var(--text-dark);
             margin: 0;
-            padding: 32px 18px 48px;
+            padding: 28px 18px 48px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -60,7 +60,7 @@
             z-index: 0;
         }
 
-        /* Dekorasi Dedaunan Sudut (Bergerak Lembut Tertiup Angin) */
+        /* Dekorasi Dedaunan Sudut */
         .foliage-layer {
             position: fixed;
             inset: 0;
@@ -109,7 +109,7 @@
             100% { transform: rotate(-1deg) scale(0.99); }
         }
 
-        /* Partikel Embun / Cahaya Hutan Melayang */
+        /* Partikel Embun Melayang */
         .dew-particles span {
             position: fixed;
             bottom: -20px;
@@ -129,16 +129,10 @@
         .dew-particles span:nth-child(5) { left: 89%; width: 8px; height: 8px; animation-duration: 15s; animation-delay: 5s; }
 
         @keyframes floatDew {
-            0% {
-                transform: translateY(0) translateX(0) scale(0.8);
-                opacity: 0;
-            }
+            0% { transform: translateY(0) translateX(0) scale(0.8); opacity: 0; }
             20% { opacity: 0.75; }
             80% { opacity: 0.5; }
-            100% {
-                transform: translateY(-105vh) translateX(28px) scale(1.15);
-                opacity: 0;
-            }
+            100% { transform: translateY(-105vh) translateX(28px) scale(1.15); opacity: 0; }
         }
 
         /* Konten Utama */
@@ -154,15 +148,24 @@
 
         .header {
             text-align: center;
-            margin-bottom: 34px;
-            max-width: 680px;
+            margin-bottom: 22px;
+            width: 100%;
+        }
+
+        .top-meta-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
         }
 
         .brand-pill {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 5px 14px;
+            padding: 6px 14px;
             border-radius: 999px;
             background: rgba(45, 106, 79, 0.1);
             border: 1px solid rgba(45, 106, 79, 0.18);
@@ -171,12 +174,37 @@
             font-weight: 700;
             letter-spacing: 0.6px;
             text-transform: uppercase;
-            margin-bottom: 12px;
+        }
+
+        /* Jam Real-Time Pill */
+        .realtime-clock-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 15px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(45, 106, 79, 0.22);
+            color: var(--leaf-deep);
+            font-size: 0.82rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            box-shadow: 0 4px 12px rgba(27, 67, 50, 0.05);
+        }
+
+        .realtime-clock-pill svg {
+            color: var(--leaf-fresh);
+            flex-shrink: 0;
+        }
+
+        .clock-divider {
+            opacity: 0.35;
         }
 
         .header h1 {
             color: var(--leaf-deep);
-            margin: 0 0 8px 0;
+            margin: 0 0 6px 0;
             font-size: clamp(1.65rem, 3vw, 2.25rem);
             font-weight: 800;
             letter-spacing: -0.5px;
@@ -197,32 +225,58 @@
             flex-wrap: wrap;
         }
 
-        .connection-status {
+        /* Indikator Status Perangkat Mobil */
+        .device-indicator {
             display: inline-flex;
             align-items: center;
             gap: 8px;
             padding: 7px 16px;
             background-color: var(--warn-bg);
             color: var(--warn-text);
-            border: 1px solid rgba(217, 119, 6, 0.25);
+            border: 1px solid rgba(217, 119, 6, 0.28);
             border-radius: 999px;
             font-size: 0.83rem;
             font-weight: 700;
-            box-shadow: 0 4px 12px rgba(27, 67, 50, 0.05);
+            box-shadow: 0 4px 12px rgba(27, 67, 50, 0.06);
             transition: all 0.3s ease;
         }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: currentColor;
-            animation: blinkDot 1.6s infinite ease-in-out;
+        .device-indicator.online {
+            background-color: var(--safe-bg);
+            color: var(--safe-text);
+            border-color: rgba(45, 106, 79, 0.3);
         }
 
-        @keyframes blinkDot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.75); }
+        .device-indicator.offline {
+            background-color: var(--danger-bg);
+            color: var(--danger-text);
+            border-color: rgba(220, 38, 38, 0.32);
+        }
+
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background-color: currentColor;
+            flex-shrink: 0;
+        }
+
+        .device-indicator.online .status-dot {
+            animation: pulseGreen 1.6s infinite ease-in-out;
+        }
+
+        .device-indicator.offline .status-dot {
+            animation: blinkFast 1s infinite ease-in-out;
+        }
+
+        @keyframes pulseGreen {
+            0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(27, 67, 50, 0.4); }
+            50% { opacity: 0.75; transform: scale(1.15); box-shadow: 0 0 0 5px rgba(27, 67, 50, 0); }
+        }
+
+        @keyframes blinkFast {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.25; }
         }
 
         .last-update {
@@ -261,12 +315,168 @@
             border-color: var(--leaf-deep);
         }
 
+        /* Banner Notifikasi Status Mobil di Web */
+        .connection-banner {
+            width: 100%;
+            margin-bottom: 24px;
+            padding: 14px 20px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            backdrop-filter: blur(12px);
+            transition: all 0.35s ease;
+            box-shadow: 0 8px 24px rgba(27, 67, 50, 0.06);
+        }
+
+        .connection-banner.state-checking {
+            background: rgba(254, 240, 199, 0.85);
+            border: 1px solid rgba(217, 119, 6, 0.28);
+            color: #78350f;
+        }
+
+        .connection-banner.state-online {
+            background: rgba(216, 243, 220, 0.85);
+            border: 1px solid rgba(45, 106, 79, 0.28);
+            color: #143627;
+        }
+
+        .connection-banner.state-offline {
+            background: rgba(254, 226, 226, 0.92);
+            border: 1.5px solid rgba(220, 38, 38, 0.38);
+            color: #991b1b;
+            box-shadow: 0 10px 26px rgba(185, 28, 28, 0.12);
+        }
+
+        .banner-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .banner-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.65);
+        }
+
+        .banner-text h4 {
+            margin: 0 0 2px 0;
+            font-size: 0.95rem;
+            font-weight: 800;
+        }
+
+        .banner-text p {
+            margin: 0;
+            font-size: 0.82rem;
+            opacity: 0.88;
+            font-weight: 500;
+        }
+
+        .banner-right-tag {
+            font-size: 0.76rem;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.65);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Pop-up Toast Notification (Pojok Kanan Atas) */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+            max-width: calc(100vw - 40px);
+        }
+
+        .toast-alert {
+            pointer-events: auto;
+            min-width: 290px;
+            max-width: 370px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.14);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: slideInToast 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .toast-alert.toast-online {
+            background: rgba(236, 253, 245, 0.96);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #065f46;
+        }
+
+        .toast-alert.toast-offline {
+            background: rgba(254, 242, 242, 0.97);
+            border: 1px solid rgba(239, 68, 68, 0.45);
+            color: #991b1b;
+        }
+
+        .toast-body {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-size: 0.88rem;
+            font-weight: 800;
+            margin: 0 0 2px 0;
+        }
+
+        .toast-desc {
+            font-size: 0.78rem;
+            margin: 0;
+            line-height: 1.35;
+            opacity: 0.9;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: currentColor;
+            opacity: 0.6;
+            cursor: pointer;
+            font-size: 1.1rem;
+            line-height: 1;
+            padding: 0 2px;
+        }
+
+        .toast-close:hover {
+            opacity: 1;
+        }
+
+        @keyframes slideInToast {
+            from { opacity: 0; transform: translateX(30px) scale(0.96); }
+            to   { opacity: 1; transform: translateX(0) scale(1); }
+        }
+
         /* Grid Kartu Sensor */
         .grid-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
             gap: 22px;
             width: 100%;
+            transition: opacity 0.35s ease, filter 0.35s ease;
+        }
+
+        /* Saat mobil mati, kartu meredup halus menandakan data terakhir */
+        .grid-container.device-offline .card {
+            opacity: 0.74;
+            filter: grayscale(28%);
         }
 
         .card {
@@ -282,16 +492,18 @@
             overflow: hidden;
             transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
                         box-shadow 0.3s ease,
-                        border-color 0.3s ease;
+                        border-color 0.3s ease,
+                        opacity 0.3s ease;
         }
 
         .card:hover {
             transform: translateY(-6px);
             border-color: rgba(64, 145, 108, 0.45);
             box-shadow: 0 18px 38px rgba(27, 67, 50, 0.14);
+            opacity: 1 !important;
+            filter: none !important;
         }
 
-        /* Watermark Urats Daun Halus di Sudut Kartu */
         .card-leaf-watermark {
             position: absolute;
             bottom: -14px;
@@ -312,6 +524,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 8px;
             margin-bottom: 14px;
         }
 
@@ -336,7 +549,7 @@
         .card h3 {
             margin: 0;
             color: var(--leaf-deep);
-            font-size: 0.98rem;
+            font-size: 0.96rem;
             font-weight: 700;
             line-height: 1.25;
         }
@@ -349,6 +562,8 @@
             padding: 3px 8px;
             border-radius: 8px;
             letter-spacing: 0.3px;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         /* Indikator Melingkar (SVG) */
@@ -378,11 +593,10 @@
             transition: stroke-dasharray 0.65s cubic-bezier(0.22, 1, 0.36, 1), stroke 0.35s ease;
         }
 
-        /* Warna Tropis Tiap Sensor */
-        .color-temp { stroke: #e07a5f; }   /* Terakota Hangat */
-        .color-hum  { stroke: #2a9d8f; }   /* Toska Lagun */
-        .color-gas  { stroke: #40916c; }   /* Hijau Hutan */
-        .color-dist { stroke: #52796f; }   /* Sage Gelap */
+        .color-temp { stroke: #e07a5f; }
+        .color-hum  { stroke: #2a9d8f; }
+        .color-gas  { stroke: #40916c; }
+        .color-dist { stroke: #52796f; }
 
         .percentage {
             fill: var(--leaf-deep);
@@ -446,6 +660,9 @@
 </head>
 <body>
 
+    <!-- Container Pop-up Toast Notifikasi -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
     <!-- Efek Pencahayaan Matahari Tropis & Partikel Embun -->
     <div class="sunbeam-glow"></div>
     <div class="dew-particles" aria-hidden="true">
@@ -454,7 +671,6 @@
 
     <!-- Dekorasi Dedaunan Tropis (SVG) -->
     <div class="foliage-layer" aria-hidden="true">
-        <!-- Daun Palem Tropis Kiri Atas -->
         <svg class="leaf-decor leaf-top-left" viewBox="0 0 300 300" fill="none">
             <path d="M10 10 C90 40, 170 110, 230 220" stroke="#1b4332" stroke-width="5" stroke-linecap="round"/>
             <path d="M40 28 C95 10, 155 15, 200 35 C150 42, 95 45, 40 28 Z" fill="#2d6a4f"/>
@@ -466,7 +682,6 @@
             <path d="M92 110 C86 168, 104 222, 138 265 C128 212, 112 160, 92 110 Z" fill="#52b788"/>
         </svg>
 
-        <!-- Daun Monstera Kanan Bawah -->
         <svg class="leaf-decor leaf-bottom-right" viewBox="0 0 320 320" fill="none">
             <path d="M300 305 C240 245, 185 185, 110 115" stroke="#1b4332" stroke-width="6" stroke-linecap="round"/>
             <path d="M275 280 C305 210, 290 130, 235 80 C215 110, 235 125, 220 138 C205 150, 185 125, 175 100 C150 115, 165 140, 150 152 C135 162, 115 135, 95 115 C75 145, 80 190, 115 225 C145 255, 180 245, 195 260 C208 272, 185 288, 170 295 C210 310, 250 302, 275 280 Z" fill="#2d6a4f"/>
@@ -474,7 +689,6 @@
             <ellipse cx="172" cy="215" rx="13" ry="7" transform="rotate(-35 172 215)" fill="#dff2e7"/>
         </svg>
 
-        <!-- Daun Pakis Kiri Bawah -->
         <svg class="leaf-decor leaf-bottom-left" viewBox="0 0 220 220" fill="none">
             <path d="M15 205 C65 145, 120 95, 190 45" stroke="#2d6a4f" stroke-width="4" stroke-linecap="round"/>
             <path d="M45 172 C35 135, 45 105, 65 85 C62 115, 58 145, 45 172 Z" fill="#40916c"/>
@@ -487,29 +701,62 @@
 
     <div class="main-wrapper">
         <header class="header">
-            <div class="brand-pill">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
-                    <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
-                </svg>
-                <span>Eco-Telemetry • ESP32</span>
+            <div class="top-meta-bar">
+                <div class="brand-pill">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+                        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+                    </svg>
+                    <span>Eco-Telemetry • ESP32</span>
+                </div>
+
+                <!-- Jam & Tanggal Real-Time -->
+                <div class="realtime-clock-pill" title="Waktu Sistem Real-Time">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <span id="live-date">-- --- ----</span>
+                    <span class="clock-divider">|</span>
+                    <span id="live-clock">00:00:00</span>
+                </div>
             </div>
+
             <h1>Dashboard RC Car</h1>
             <p>Pemantauan Sensor Lingkungan & Navigasi Secara Real-Time</p>
 
             <div class="status-bar">
-                <div id="conn-status" class="connection-status">
+                <!-- Indikator Status Alat RC Car -->
+                <div id="device-indicator" class="device-indicator">
                     <span class="status-dot"></span>
-                    <span id="conn-text">Menghubungkan ke Firebase...</span>
+                    <span id="device-status-text">Mengecek Status Mobil...</span>
                 </div>
-                <div id="last-update" class="last-update">Menunggu data sensor...</div>
+
+                <div id="last-update" class="last-update">Update Data: Menunggu...</div>
+
                 <button id="sim-toggle" class="sim-btn" type="button" onclick="toggleSimulation()">
                     Mode Simulasi: Off
                 </button>
             </div>
         </header>
 
-        <main class="grid-container">
+        <!-- Banner Notifikasi Status Koneksi Mobil -->
+        <div id="connection-banner" class="connection-banner state-checking" role="status">
+            <div class="banner-left">
+                <div id="banner-icon" class="banner-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/>
+                    </svg>
+                </div>
+                <div class="banner-text">
+                    <h4 id="banner-title">Memeriksa Koneksi Mobil RC...</h4>
+                    <p id="banner-desc">Menunggu sinyal data terbaru dari mikrokontroler ESP32.</p>
+                </div>
+            </div>
+            <div id="banner-tag" class="banner-right-tag">Standby</div>
+        </div>
+
+        <main id="sensor-grid" class="grid-container">
             <!-- 1. Sensor Suhu (DHT22) -->
             <section class="card">
                 <svg class="card-leaf-watermark" viewBox="0 0 24 24" fill="#1b4332">
@@ -636,39 +883,191 @@
     </div>
 
     <script>
-        // Konfigurasi Firebase Realtime Database
+        // ==========================================
+        // 1. JAM & TANGGAL REAL-TIME
+        // ==========================================
+        function updateRealtimeClock() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('id-ID', {
+                weekday: 'short',
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+            const timeStr = now.toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).replace(/\./g, ':');
+
+            document.getElementById('live-date').textContent = dateStr;
+            document.getElementById('live-clock').textContent = timeStr;
+        }
+        updateRealtimeClock();
+        setInterval(updateRealtimeClock, 1000);
+
+        // ==========================================
+        // 2. KONFIGURASI FIREBASE & WATCHDOG ALAT
+        // ==========================================
         const FIREBASE_URL = "https://rc-telementri-default-rtdb.asia-southeast1.firebasedatabase.app";
         const FIREBASE_AUTH = "y4KdPtOZOokvMWl8qdZuSUpeOla0NAXgQsOW5a02";
         const DB_PATH = "/Sensor.json";
-
         const streamUrl = `${FIREBASE_URL}${DB_PATH}?auth=${FIREBASE_AUTH}`;
 
-        // State data sensor
+        // Batas waktu (detik) tanpa data baru sebelum alat dianggap MATI
+        const OFFLINE_TIMEOUT_MS = 10000;      // 10 detik saat sedang berjalan
+        const INITIAL_CHECK_MS = 6000;         // 6 detik verifikasi saat halaman baru dibuka
+
         let sensorData = { Suhu: 0, Kelembapan: 0, Gas: 0, Jarak: 0 };
         let hasReceivedData = false;
+        let receivedInitialSnapshot = false;
+        let isCarOnline = null; // null = mengecek, true = nyala, false = mati
+        let lastPacketTimestamp = null;
+        let watchdogTimer = null;
         let simInterval = null;
 
-        const statusBadge = document.getElementById('conn-status');
-        const statusText = document.getElementById('conn-text');
+        const deviceIndicator = document.getElementById('device-indicator');
+        const deviceStatusText = document.getElementById('device-status-text');
         const lastUpdateText = document.getElementById('last-update');
+        const bannerEl = document.getElementById('connection-banner');
+        const bannerIcon = document.getElementById('banner-icon');
+        const bannerTitle = document.getElementById('banner-title');
+        const bannerDesc = document.getElementById('banner-desc');
+        const bannerTag = document.getElementById('banner-tag');
+        const sensorGrid = document.getElementById('sensor-grid');
+
+        // Pop-up Toast Notifikasi
+        function showToast(type, title, description) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-alert ${type === 'online' ? 'toast-online' : 'toast-offline'}`;
+
+            const iconSvg = type === 'online'
+                ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
+                : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+
+            toast.innerHTML = `
+                <div style="margin-top:2px; flex-shrink:0;">${iconSvg}</div>
+                <div class="toast-body">
+                    <p class="toast-title">${title}</p>
+                    <p class="toast-desc">${description}</p>
+                </div>
+                <button class="toast-close" aria-label="Tutup">×</button>
+            `;
+
+            toast.querySelector('.toast-close').onclick = () => toast.remove();
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(25px)';
+                    toast.style.transition = 'all 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 6000);
+        }
+
+        // Ubah status visual & notifikasi jika Mobil NYALA vs MATI
+        function setCarConnectionState(online, customReason = null) {
+            const stateChanged = isCarOnline !== online;
+            isCarOnline = online;
+
+            if (online) {
+                deviceIndicator.className = "device-indicator online";
+                deviceStatusText.textContent = simInterval
+                    ? "Mobil Terhubung (Simulasi)"
+                    : "Mobil Nyala • Terhubung";
+
+                bannerEl.className = "connection-banner state-online";
+                bannerIcon.innerHTML = `
+                    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#1b4332" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
+                    </svg>`;
+                bannerTitle.textContent = "Mobil Terhubung & Aktif";
+                bannerDesc.textContent = simInterval
+                    ? "Menampilkan aliran data simulasi sensor secara real-time."
+                    : "Perangkat ESP32 pada mobil RC menyala dan mengirimkan data sensor.";
+                bannerTag.textContent = "STATUS: ONLINE";
+                sensorGrid.classList.remove("device-offline");
+
+                if (stateChanged) {
+                    showToast(
+                        'online',
+                        'Mobil Terhubung',
+                        'Alat RC Car menyala dan siap dipantau secara real-time.'
+                    );
+                }
+            } else {
+                deviceIndicator.className = "device-indicator offline";
+                deviceStatusText.textContent = "Mobil Tidak Terhubung (Mati)";
+
+                bannerEl.className = "connection-banner state-offline";
+                bannerIcon.innerHTML = `
+                    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
+                    </svg>`;
+                bannerTitle.textContent = "Notifikasi: Mobil Tidak Terhubung";
+                bannerDesc.textContent = customReason || "Alat dalam keadaan mati atau tidak ada sinyal data masuk dari ESP32.";
+                bannerTag.textContent = "STATUS: OFFLINE";
+                sensorGrid.classList.add("device-offline");
+
+                if (stateChanged) {
+                    showToast(
+                        'offline',
+                        'Mobil Tidak Terhubung!',
+                        'Tidak ada sinyal dari alat RC Car. Periksa daya baterai atau koneksi Wi-Fi mobil.'
+                    );
+                }
+            }
+        }
+
+        // Reset timer pemantau detak data (heartbeat watchdog)
+        function resetDeviceWatchdog(timeoutMs = OFFLINE_TIMEOUT_MS) {
+            clearTimeout(watchdogTimer);
+            watchdogTimer = setTimeout(() => {
+                if (!simInterval) {
+                    setCarConnectionState(
+                        false,
+                        "Alat RC Car mati atau berhenti mengirim data lebih dari 10 detik."
+                    );
+                }
+            }, timeoutMs);
+        }
+
+        // Timer penghitung durasi mati di tag kanan banner
+        setInterval(() => {
+            if (isCarOnline === false && lastPacketTimestamp && !simInterval) {
+                const diffSec = Math.floor((Date.now() - lastPacketTimestamp) / 1000);
+                if (diffSec < 60) {
+                    bannerTag.textContent = `Mati ${diffSec} dtk lalu`;
+                } else {
+                    const diffMin = Math.floor(diffSec / 60);
+                    bannerTag.textContent = `Mati ${diffMin} mnt lalu`;
+                }
+            }
+        }, 1000);
+
+        // ==========================================
+        // 3. STREAMING REAL-TIME FIREBASE
+        // ==========================================
         const eventSource = new EventSource(streamUrl);
 
         eventSource.onopen = () => {
-            if (!simInterval) {
-                statusText.textContent = "Terhubung Real-Time";
-                statusBadge.style.backgroundColor = "#d8f3dc";
-                statusBadge.style.color = "#1b4332";
-                statusBadge.style.borderColor = "rgba(45, 106, 79, 0.28)";
+            if (!simInterval && isCarOnline === null) {
+                deviceStatusText.textContent = "Memverifikasi Sinyal Mobil...";
+                resetDeviceWatchdog(INITIAL_CHECK_MS);
             }
         };
 
         eventSource.onerror = (err) => {
             console.error("EventSource error:", err);
             if (!simInterval) {
-                statusText.textContent = "Koneksi Terputus / Mencoba Ulang...";
-                statusBadge.style.backgroundColor = "#fee2e2";
-                statusBadge.style.color = "#b91c1c";
-                statusBadge.style.borderColor = "rgba(220, 38, 38, 0.28)";
+                setCarConnectionState(
+                    false,
+                    "Koneksi internet/Firebase terputus atau alat dalam keadaan mati."
+                );
             }
         };
 
@@ -676,35 +1075,61 @@
         eventSource.addEventListener('patch', handleFirebaseData);
 
         function handleFirebaseData(event) {
-            if (simInterval) return; // Abaikan stream saat mode simulasi aktif
+            if (simInterval) return;
             if (!event.data || event.data === "null") return;
 
             try {
                 const payload = JSON.parse(event.data);
                 if (!payload || payload.data === undefined) return;
 
+                let dataUpdated = false;
+
                 if (payload.path === "/") {
                     if (payload.data && typeof payload.data === "object") {
                         sensorData = { ...sensorData, ...payload.data };
                         hasReceivedData = true;
+                        dataUpdated = true;
                     }
                 } else {
                     const key = payload.path.replace(/^\//, "");
                     if (key in sensorData) {
                         sensorData[key] = payload.data;
                         hasReceivedData = true;
+                        dataUpdated = true;
                     }
                 }
 
-                const now = new Date().toLocaleTimeString('id-ID');
-                lastUpdateText.textContent = `Update: ${now}`;
+                if (!dataUpdated) return;
+
                 updateDashboard();
+
+                // Paket pertama saat halaman baru dibuka merupakan cache terakhir dari Firebase.
+                // Jika masuk paket berikutnya (atau ada update live), berarti alat benar-benar menyala.
+                if (!receivedInitialSnapshot) {
+                    receivedInitialSnapshot = true;
+                    lastUpdateText.textContent = "Data Terakhir Tersimpan";
+                    resetDeviceWatchdog(INITIAL_CHECK_MS);
+                } else {
+                    lastPacketTimestamp = Date.now();
+                    const nowStr = new Date().toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false
+                    }).replace(/\./g, ':');
+                    lastUpdateText.textContent = `Update Data: ${nowStr}`;
+
+                    setCarConnectionState(true);
+                    resetDeviceWatchdog(OFFLINE_TIMEOUT_MS);
+                }
             } catch (error) {
                 console.error("Gagal mem-parsing data Firebase:", error);
             }
         }
 
-        // Fungsi pembaruan Indikator Visual (Gauges)
+        // ==========================================
+        // 4. PEMBARUAN GAUGE & STATUS SENSOR
+        // ==========================================
         function updateGauge(idPrefix, rawValue, min, max, alertColor = null) {
             const value = Number(rawValue);
             const safeValue = Number.isFinite(value) ? value : 0;
@@ -726,7 +1151,6 @@
             return safeValue;
         }
 
-        // Fungsi evaluasi status sensor
         function updateDashboard() {
             // 1. DHT22 Suhu (0 - 50 °C)
             const isOverheat = Number(sensorData.Suhu) > 35;
@@ -781,7 +1205,9 @@
             }
         }
 
-        // Tombol Simulasi Data untuk Pengujian Tampilan Tanpa Hardware
+        // ==========================================
+        // 5. MODE SIMULASI
+        // ==========================================
         function toggleSimulation() {
             const btn = document.getElementById('sim-toggle');
             if (simInterval) {
@@ -789,25 +1215,30 @@
                 simInterval = null;
                 btn.textContent = "Mode Simulasi: Off";
                 btn.classList.remove("active");
-                statusText.textContent = "Terhubung Real-Time";
-                statusBadge.style.backgroundColor = "#d8f3dc";
-                statusBadge.style.color = "#1b4332";
+                setCarConnectionState(false, "Mode simulasi dimatikan. Menunggu sinyal nyata dari ESP32...");
+                resetDeviceWatchdog(5000);
             } else {
+                clearTimeout(watchdogTimer);
                 btn.textContent = "Mode Simulasi: On";
                 btn.classList.add("active");
-                statusText.textContent = "Simulasi Aktif";
-                statusBadge.style.backgroundColor = "#fef0c7";
-                statusBadge.style.color = "#92400e";
 
                 const runStep = () => {
                     hasReceivedData = true;
+                    lastPacketTimestamp = Date.now();
                     sensorData = {
                         Suhu: +(26 + Math.random() * 11).toFixed(1),
                         Kelembapan: Math.floor(55 + Math.random() * 30),
                         Gas: Math.floor(320 + Math.random() * 1350),
                         Jarak: Math.floor(10 + Math.random() * 140)
                     };
-                    lastUpdateText.textContent = `Simulasi: ${new Date().toLocaleTimeString('id-ID')}`;
+                    const nowStr = new Date().toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false
+                    }).replace(/\./g, ':');
+                    lastUpdateText.textContent = `Simulasi: ${nowStr}`;
+                    setCarConnectionState(true);
                     updateDashboard();
                 };
                 runStep();
@@ -815,7 +1246,6 @@
             }
         }
 
-        // Tutup koneksi stream saat tab ditutup
         window.addEventListener('beforeunload', () => {
             eventSource.close();
         });
