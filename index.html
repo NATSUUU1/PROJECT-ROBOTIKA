@@ -303,7 +303,6 @@
             color: #78350f;
         }
 
-        /* Hijau: ESP32 Terhubung / Sensor Terbaca */
         .notif-bar.state-green {
             background: rgba(209, 250, 229, 0.94);
             border: 1.5px solid rgba(16, 185, 129, 0.45);
@@ -311,7 +310,6 @@
             box-shadow: 0 10px 24px rgba(16, 185, 129, 0.1);
         }
 
-        /* Kuning/Oranye: Sensor Mendeteksi Peringatan / Ambang Batas */
         .notif-bar.state-warn {
             background: rgba(254, 243, 199, 0.95);
             border: 1.5px solid rgba(245, 158, 11, 0.48);
@@ -319,7 +317,6 @@
             box-shadow: 0 10px 24px rgba(217, 119, 6, 0.11);
         }
 
-        /* Merah: ESP32 Terputus / Sensor Tidak Terbaca */
         .notif-bar.state-red {
             background: rgba(254, 226, 226, 0.95);
             border: 1.5px solid rgba(220, 38, 38, 0.42);
@@ -763,7 +760,7 @@
 
         <!-- 2 BAR NOTIFIKASI TERPISAH -->
         <div class="banners-stack">
-            <!-- BAR 1: Notifikasi Koneksi Perangkat ESP32 (Dicolok / Menyala vs Mati / Terputus) -->
+            <!-- BAR 1: MODUL KONEKSI PERANGKAT ESP32 (Mendengarkan /ESP32_Status) -->
             <div id="esp-banner" class="notif-bar state-checking" role="status">
                 <div class="banner-left">
                     <div id="esp-banner-icon" class="banner-icon">
@@ -772,15 +769,15 @@
                         </svg>
                     </div>
                     <div class="banner-text">
-                        <span class="banner-category">Status Perangkat ESP32</span>
+                        <span class="banner-category">Modul 1 • Status Perangkat ESP32</span>
                         <h4 id="esp-banner-title">Memeriksa Koneksi ESP32...</h4>
-                        <p id="esp-banner-desc">Menunggu sinyal dari mikrokontroler ESP32 saat dicolokkan atau dinyalakan.</p>
+                        <p id="esp-banner-desc">Menunggu sinyal heartbeat dari mikrokontroler ESP32 saat dicolokkan.</p>
                     </div>
                 </div>
                 <div id="esp-banner-tag" class="banner-right-tag">MENGECEK</div>
             </div>
 
-            <!-- BAR 2: Notifikasi Pembacaan Nilai Sensor (Terbaca / Terdeteksi / Tidak Terbaca) -->
+            <!-- BAR 2: MODUL PEMBACAAN NILAI SENSOR (Mendengarkan /Sensor) -->
             <div id="sensor-banner" class="notif-bar state-checking" role="status">
                 <div class="banner-left">
                     <div id="sensor-banner-icon" class="banner-icon">
@@ -789,9 +786,9 @@
                         </svg>
                     </div>
                     <div class="banner-text">
-                        <span class="banner-category">Status Pembacaan Sensor</span>
+                        <span class="banner-category">Modul 2 • Status Pembacaan Sensor</span>
                         <h4 id="sensor-banner-title">Memeriksa Pembacaan Sensor...</h4>
-                        <p id="sensor-banner-desc">Menunggu hasil pembacaan data sensor lingkungan & rintangan.</p>
+                        <p id="sensor-banner-desc">Menunggu hasil pembacaan sensor lingkungan & rintangan.</p>
                     </div>
                 </div>
                 <div id="sensor-banner-tag" class="banner-right-tag">MENGECEK</div>
@@ -887,7 +884,7 @@
                     </svg>
                 </div>
 
-                <div class="scale-range">Ambang Bahaya: > 1500 ADC</div>
+                <div class="scale-range">Ambang Bahaya: > 2000 ADC</div>
                 <div id="status-gas" class="status-badge status-offline">Tidak Terbaca</div>
             </section>
 
@@ -926,24 +923,55 @@
 
     <script>
         // ==========================================
-        // 1. SISTEM ALARM SUARA (WEB AUDIO API)
+        // KONFIGURASI UMUM & UTILITAS WAKTU / SUARA / TOAST
         // ==========================================
+        const FIREBASE_URL = "https://rc-telementri-default-rtdb.asia-southeast1.firebasedatabase.app";
+        const FIREBASE_AUTH = "y4KdPtOZOokvMWl8qdZuSUpeOla0NAXgQsOW5a02";
+        const SENSOR_PATH = "/Sensor.json";
+        const ESP_STATUS_PATH = "/ESP32_Status.json";
+
+        // Threshold disesuaikan persis dengan kode ESP32
+        const GAS_THRESHOLD_VAL = 2000;
+        const HUMIDITY_HIGH_VAL = 80;
+
+        let isSimulationActive = false;
+        let simTimer = null;
+
+        function formatTime24(dateObj = new Date()) {
+            return dateObj.toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).replace(/\./g, ':');
+        }
+
+        function updateRealtimeClock() {
+            const now = new Date();
+            document.getElementById('live-date').textContent = now.toLocaleDateString('id-ID', {
+                weekday: 'short',
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+            document.getElementById('live-clock').textContent = formatTime24(now);
+        }
+        updateRealtimeClock();
+        setInterval(updateRealtimeClock, 1000);
+
+        // Sistem Alarm Suara (Web Audio API)
         let audioCtx = null;
         let alarmEnabled = true;
 
         function initAudioContext() {
             if (!audioCtx) {
                 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                if (AudioContextClass) {
-                    audioCtx = new AudioContextClass();
-                }
+                if (AudioContextClass) audioCtx = new AudioContextClass();
             }
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
         }
-
-        // Aktifkan AudioContext pada interaksi pertama user di halaman
         ['click', 'touchstart', 'keydown'].forEach(evt => {
             window.addEventListener(evt, initAudioContext, { once: true });
         });
@@ -955,60 +983,49 @@
                 if (!audioCtx) return;
 
                 const now = audioCtx.currentTime;
-
                 if (type === 'connected') {
-                    // Alarm Terhubung: 4 nada naik yang jernih (C5 -> E5 -> G5 -> C6)
+                    // Alarm Terhubung ESP32: 4 nada naik jernih
                     const notes = [523.25, 659.25, 783.99, 1046.50];
                     notes.forEach((freq, idx) => {
                         const osc = audioCtx.createOscillator();
                         const gain = audioCtx.createGain();
                         osc.type = 'triangle';
                         osc.frequency.setValueAtTime(freq, now + idx * 0.11);
-
                         gain.gain.setValueAtTime(0.001, now + idx * 0.11);
                         gain.gain.exponentialRampToValueAtTime(0.24, now + idx * 0.11 + 0.02);
                         gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.11 + 0.24);
-
                         osc.connect(gain);
                         gain.connect(audioCtx.destination);
-
                         osc.start(now + idx * 0.11);
                         osc.stop(now + idx * 0.11 + 0.25);
                     });
                 } else if (type === 'disconnected') {
                     // Nada turun saat ESP32 terputus / mati
-                    const notes = [440, 329.63];
-                    notes.forEach((freq, idx) => {
+                    [440, 329.63].forEach((freq, idx) => {
                         const osc = audioCtx.createOscillator();
                         const gain = audioCtx.createGain();
                         osc.type = 'sine';
                         osc.frequency.setValueAtTime(freq, now + idx * 0.16);
-
                         gain.gain.setValueAtTime(0.001, now + idx * 0.16);
                         gain.gain.exponentialRampToValueAtTime(0.18, now + idx * 0.16 + 0.02);
                         gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.16 + 0.28);
-
                         osc.connect(gain);
                         gain.connect(audioCtx.destination);
-
                         osc.start(now + idx * 0.16);
                         osc.stop(now + idx * 0.16 + 0.3);
                     });
                 } else if (type === 'sensor-alert') {
-                    // Beep singkat saat sensor mendeteksi bahaya
+                    // Beep peringatan sensor mendeteksi bahaya
                     [880, 880].forEach((freq, idx) => {
                         const osc = audioCtx.createOscillator();
                         const gain = audioCtx.createGain();
                         osc.type = 'sine';
                         osc.frequency.setValueAtTime(freq, now + idx * 0.14);
-
                         gain.gain.setValueAtTime(0.001, now + idx * 0.14);
                         gain.gain.exponentialRampToValueAtTime(0.14, now + idx * 0.14 + 0.015);
                         gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.14 + 0.11);
-
                         osc.connect(gain);
                         gain.connect(audioCtx.destination);
-
                         osc.start(now + idx * 0.14);
                         osc.stop(now + idx * 0.14 + 0.12);
                     });
@@ -1027,7 +1044,7 @@
                 btn.classList.add('active');
                 btn.classList.remove('muted');
                 label.textContent = "Alarm Suara: Aktif";
-                playAlarmSound('connected'); // Bunyikan pratinjau alarm saat diaktifkan
+                playAlarmSound('connected');
             } else {
                 btn.classList.remove('active');
                 btn.classList.add('muted');
@@ -1035,68 +1052,7 @@
             }
         }
 
-        // ==========================================
-        // 2. JAM & TANGGAL REAL-TIME
-        // ==========================================
-        function formatTime24(dateObj = new Date()) {
-            return dateObj.toLocaleTimeString('id-ID', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            }).replace(/\./g, ':');
-        }
-
-        function updateRealtimeClock() {
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('id-ID', {
-                weekday: 'short',
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-            });
-            document.getElementById('live-date').textContent = dateStr;
-            document.getElementById('live-clock').textContent = formatTime24(now);
-        }
-        updateRealtimeClock();
-        setInterval(updateRealtimeClock, 1000);
-
-        // ==========================================
-        // 3. LOGIKA KONEKSI ESP32 & PEMBACAAN SENSOR
-        // ==========================================
-        const FIREBASE_URL = "https://rc-telementri-default-rtdb.asia-southeast1.firebasedatabase.app";
-        const FIREBASE_AUTH = "y4KdPtOZOokvMWl8qdZuSUpeOla0NAXgQsOW5a02";
-        const DB_PATH = "/Sensor.json";
-        const streamUrl = `${FIREBASE_URL}${DB_PATH}?auth=${FIREBASE_AUTH}`;
-
-        const INITIAL_VERIFY_MS = 3500;
-        const OFFLINE_TIMEOUT_MS = 7000;
-
-        let sensorData = { Suhu: null, Kelembapan: null, Gas: null, Jarak: null };
-        let initialPacketSkipped = false;
-        let isEspConnected = null;        // Status ESP32: null | true | false
-        let lastSensorStateKey = null;    // Melacak perubahan status pembacaan sensor agar toast tidak spam
-        let watchdogTimer = null;
-        let simInterval = null;
-
-        const lastUpdateText = document.getElementById('last-update');
-        const sensorGrid = document.getElementById('sensor-grid');
-
-        // Elemen Bar 1: Koneksi ESP32
-        const espBanner = document.getElementById('esp-banner');
-        const espBannerIcon = document.getElementById('esp-banner-icon');
-        const espBannerTitle = document.getElementById('esp-banner-title');
-        const espBannerDesc = document.getElementById('esp-banner-desc');
-        const espBannerTag = document.getElementById('esp-banner-tag');
-
-        // Elemen Bar 2: Pembacaan Sensor
-        const sensorBanner = document.getElementById('sensor-banner');
-        const sensorBannerIcon = document.getElementById('sensor-banner-icon');
-        const sensorBannerTitle = document.getElementById('sensor-banner-title');
-        const sensorBannerDesc = document.getElementById('sensor-banner-desc');
-        const sensorBannerTag = document.getElementById('sensor-banner-tag');
-
-        // Pop-up Toast dengan Kategori Terpisah ("KONEKSI ESP32" vs "PEMBACAAN SENSOR")
+        // Sistem Pop-up Toast Terpisah
         function showToast(category, variant, title, description) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -1131,244 +1087,204 @@
             }, 5500);
         }
 
-        function isValidNumber(val) {
-            return val !== null && val !== undefined && val !== "" && Number.isFinite(Number(val));
-        }
+        // =========================================================================
+        // MODUL A (TERPISAH): KONTROLER KONEKSI PERANGKAT ESP32
+        // Mendengarkan /ESP32_Status.json (/ESP32_Status/heartbeat dari ESP32)
+        // =========================================================================
+        const EspConnectionController = (() => {
+            const INITIAL_CHECK_MS = 4500;   // Verifikasi awal saat halaman dibuka (4.5 detik)
+            const OFFLINE_TIMEOUT_MS = 7000; // Jika 7 detik tidak ada heartbeat baru -> ESP32 Mati
 
-        // Evaluasi lengkap status pembacaan sensor & deteksi ambang batas
-        function evaluateSensorReadings() {
-            if (!isEspConnected) {
-                return {
-                    stateKey: 'offline',
-                    variant: 'red',
-                    title: 'Sensor Tidak Terbaca',
-                    desc: 'Tidak ada pembacaan nilai sensor karena perangkat ESP32 dalam keadaan mati / terputus.',
-                    tag: 'TIDAK TERBACA'
-                };
-            }
+            let isConnected = null;
+            let initialHeartbeat = undefined;
+            let watchdogTimer = null;
 
-            const missingSensors = [];
-            if (!isValidNumber(sensorData.Suhu)) missingSensors.push('Suhu (DHT22)');
-            if (!isValidNumber(sensorData.Kelembapan)) missingSensors.push('Kelembapan (DHT22)');
-            if (!isValidNumber(sensorData.Gas)) missingSensors.push('Gas/Asap (MQ-2)');
-            if (!isValidNumber(sensorData.Jarak)) missingSensors.push('Jarak (HC-SR04)');
+            const banner = document.getElementById('esp-banner');
+            const icon = document.getElementById('esp-banner-icon');
+            const title = document.getElementById('esp-banner-title');
+            const desc = document.getElementById('esp-banner-desc');
+            const tag = document.getElementById('esp-banner-tag');
 
-            if (missingSensors.length > 0) {
-                return {
-                    stateKey: 'missing-' + missingSensors.join(','),
-                    variant: 'red',
-                    title: 'Sensor Tidak Terbaca',
-                    desc: `ESP32 menyala, namun sensor tidak terbaca: ${missingSensors.join(', ')}.`,
-                    tag: 'TIDAK TERBACA'
-                };
-            }
+            function setState(connected) {
+                const changed = isConnected !== connected;
+                isConnected = connected;
 
-            // Cek kondisi yang terdeteksi oleh sensor
-            const detections = [];
-            const suhu = Number(sensorData.Suhu);
-            const hum = Number(sensorData.Kelembapan);
-            const gas = Number(sensorData.Gas);
-            const jarak = Number(sensorData.Jarak);
+                if (connected) {
+                    banner.className = "notif-bar state-green";
+                    icon.innerHTML = `
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
+                        </svg>`;
+                    title.textContent = "ESP32 Terhubung & Menyala";
+                    desc.textContent = isSimulationActive
+                        ? "Mode simulasi aktif — perangkat ESP32 virtual terhubung ke dashboard."
+                        : "Perangkat ESP32 berhasil dicolokkan dan aktif mengirim heartbeat ke Firebase.";
+                    tag.textContent = "ESP32: TERHUBUNG";
 
-            if (suhu > 35) detections.push(`Suhu Tinggi (${suhu}°C)`);
-            if (hum > 80) detections.push(`Kelembapan Tinggi (${hum}%)`);
-            if (hum < 30) detections.push(`Udara Kering (${hum}%)`);
-            if (gas > 1500) detections.push(`Gas/Asap Terdeteksi (${gas} ADC)`);
-            if (jarak < 15) detections.push(`Rintangan Dekat (${jarak} cm)`);
-
-            if (detections.length > 0) {
-                const detSummary = detections.join(' • ');
-                return {
-                    stateKey: 'detected-' + detections.map(d => d.split(' (')[0]).join(','),
-                    variant: 'warn',
-                    title: `Sensor Terdeteksi: ${detections.map(d => d.split(' (')[0]).join(', ')}`,
-                    desc: `Nilai sensor terbaca aktif dengan peringatan: ${detSummary}.`,
-                    tag: 'TERDETEKSI'
-                };
-            }
-
-            return {
-                stateKey: 'readable-normal',
-                variant: 'green',
-                title: 'Sensor Terbaca (Kondisi Aman)',
-                desc: 'Seluruh sensor (DHT22, MQ-2, HC-SR04) terbaca normal tanpa peringatan.',
-                tag: 'SENSOR TERBACA'
-            };
-        }
-
-        // Update Bar 2 (Notifikasi Pembacaan Sensor) + Toast khusus Sensor
-        function syncSensorNotificationBar(triggerToast = true) {
-            const info = evaluateSensorReadings();
-
-            sensorBanner.className = `notif-bar state-${info.variant}`;
-            sensorBannerTitle.textContent = info.title;
-            sensorBannerDesc.textContent = info.desc;
-            sensorBannerTag.textContent = info.tag;
-
-            if (info.variant === 'green') {
-                sensorBannerIcon.innerHTML = `
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-                    </svg>`;
-            } else if (info.variant === 'warn') {
-                sensorBannerIcon.innerHTML = `
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-                    </svg>`;
-            } else {
-                sensorBannerIcon.innerHTML = `
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
-                    </svg>`;
-            }
-
-            // Munculkan Toast & Alarm khusus Pembacaan Sensor saat status pembacaan berubah
-            if (triggerToast && lastSensorStateKey !== info.stateKey) {
-                lastSensorStateKey = info.stateKey;
-                showToast('SENSOR', info.variant, info.title, info.desc);
-                if (info.variant === 'warn') {
-                    playAlarmSound('sensor-alert');
-                }
-            } else {
-                lastSensorStateKey = info.stateKey;
-            }
-        }
-
-        // Update Bar 1 (Notifikasi Koneksi ESP32) + Alarm & Toast khusus ESP32
-        function setEspConnectionState(connected) {
-            const stateChanged = isEspConnected !== connected;
-            isEspConnected = connected;
-
-            if (connected) {
-                espBanner.className = "notif-bar state-green";
-                espBannerIcon.innerHTML = `
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
-                    </svg>`;
-                espBannerTitle.textContent = "ESP32 Terhubung & Menyala";
-                espBannerDesc.textContent = simInterval
-                    ? "Mode simulasi aktif — perangkat virtual terhubung ke dashboard."
-                    : "Perangkat ESP32 berhasil dicolokkan dan aktif terhubung ke jaringan.";
-                espBannerTag.textContent = "ESP32: TERHUBUNG";
-                sensorGrid.classList.remove("device-offline");
-
-                if (stateChanged) {
-                    playAlarmSound('connected');
-                    showToast(
-                        'ESP32',
-                        'green',
-                        'ESP32 Terhubung & Menyala',
-                        'Perangkat ESP32 berhasil dicolokkan dan terhubung ke website.'
-                    );
-                }
-            } else {
-                espBanner.className = "notif-bar state-red";
-                espBannerIcon.innerHTML = `
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
-                    </svg>`;
-                espBannerTitle.textContent = "ESP32 Tidak Terhubung / Mati";
-                espBannerDesc.textContent = "Perangkat ESP32 terputus, belum dicolokkan, atau daya dalam keadaan mati.";
-                espBannerTag.textContent = "ESP32: TERPUTUS";
-                sensorGrid.classList.add("device-offline");
-
-                resetGaugesToOffline();
-
-                if (stateChanged) {
-                    playAlarmSound('disconnected');
-                    showToast(
-                        'ESP32',
-                        'red',
-                        'ESP32 Tidak Terhubung / Mati',
-                        'Koneksi ESP32 terputus. Periksa kabel daya atau jaringan Wi-Fi perangkat.'
-                    );
-                }
-            }
-
-            syncSensorNotificationBar(true);
-        }
-
-        function resetWatchdog(timeoutMs = OFFLINE_TIMEOUT_MS) {
-            clearTimeout(watchdogTimer);
-            watchdogTimer = setTimeout(() => {
-                if (!simInterval) {
-                    setEspConnectionState(false);
-                }
-            }, timeoutMs);
-        }
-
-        // ==========================================
-        // 4. STREAMING REAL-TIME FIREBASE
-        // ==========================================
-        const eventSource = new EventSource(streamUrl);
-
-        eventSource.onopen = () => {
-            if (!simInterval && isEspConnected === null) {
-                resetWatchdog(INITIAL_VERIFY_MS);
-            }
-        };
-
-        eventSource.onerror = () => {
-            if (!simInterval) {
-                setEspConnectionState(false);
-            }
-        };
-
-        eventSource.addEventListener('put', handleFirebaseData);
-        eventSource.addEventListener('patch', handleFirebaseData);
-
-        function handleFirebaseData(event) {
-            if (simInterval) return;
-            if (!event.data || event.data === "null") return;
-
-            try {
-                const payload = JSON.parse(event.data);
-                if (!payload || payload.data === undefined) return;
-
-                if (payload.path === "/" && !initialPacketSkipped) {
-                    initialPacketSkipped = true;
-                    if (payload.data && typeof payload.data === "object") {
-                        sensorData = { ...sensorData, ...payload.data };
-                    }
-                    resetWatchdog(INITIAL_VERIFY_MS);
-                    return;
-                }
-
-                if (payload.path === "/") {
-                    if (payload.data && typeof payload.data === "object") {
-                        sensorData = { ...sensorData, ...payload.data };
+                    if (changed) {
+                        playAlarmSound('connected');
+                        showToast(
+                            'ESP32',
+                            'green',
+                            'ESP32 Terhubung & Menyala',
+                            'Perangkat ESP32 berhasil dicolokkan dan terhubung ke website.'
+                        );
                     }
                 } else {
-                    const key = payload.path.replace(/^\//, "");
-                    if (key in sensorData) {
-                        sensorData[key] = payload.data;
+                    banner.className = "notif-bar state-red";
+                    icon.innerHTML = `
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
+                        </svg>`;
+                    title.textContent = "ESP32 Tidak Terhubung / Mati";
+                    desc.textContent = "Perangkat ESP32 terputus, belum dicolokkan, atau daya dalam keadaan mati.";
+                    tag.textContent = "ESP32: TERPUTUS";
+
+                    if (changed) {
+                        playAlarmSound('disconnected');
+                        showToast(
+                            'ESP32',
+                            'red',
+                            'ESP32 Tidak Terhubung / Mati',
+                            'Koneksi ESP32 terputus. Periksa kabel daya atau jaringan Wi-Fi perangkat.'
+                        );
                     }
                 }
-
-                lastUpdateText.textContent = `Update Data: ${formatTime24(new Date())}`;
-                setEspConnectionState(true);
-                updateDashboard();
-                resetWatchdog(OFFLINE_TIMEOUT_MS);
-            } catch (error) {
-                console.error("Gagal mem-parsing data Firebase:", error);
             }
-        }
 
-        // ==========================================
-        // 5. PEMBARUAN GAUGE & KARTU SENSOR
-        // ==========================================
-        function resetGaugesToOffline() {
-            const sensors = [
-                { id: 'temp', badge: 'status-temp' },
-                { id: 'hum',  badge: 'status-hum' },
-                { id: 'gas',  badge: 'status-gas' },
-                { id: 'dist', badge: 'status-dist' }
-            ];
+            function kickWatchdog(ms = OFFLINE_TIMEOUT_MS) {
+                clearTimeout(watchdogTimer);
+                watchdogTimer = setTimeout(() => {
+                    if (!isSimulationActive) setState(false);
+                }, ms);
+            }
 
-            sensors.forEach(({ id, badge }) => {
-                const circle = document.getElementById(`circle-${id}`);
-                const textVal = document.getElementById(`val-${id}`);
-                const badgeEl = document.getElementById(badge);
+            // Stream Khusus Heartbeat ESP32 (/ESP32_Status.json)
+            const statusStream = new EventSource(`${FIREBASE_URL}${ESP_STATUS_PATH}?auth=${FIREBASE_AUTH}`);
+            statusStream.onopen = () => {
+                if (!isSimulationActive && isConnected === null) {
+                    kickWatchdog(INITIAL_CHECK_MS);
+                }
+            };
+            statusStream.onerror = () => {
+                if (!isSimulationActive) setState(false);
+            };
+
+            const onHeartbeatPacket = (event) => {
+                if (isSimulationActive || !event.data) return;
+                try {
+                    const payload = JSON.parse(event.data);
+                    if (!payload) return;
+
+                    let currentHb = null;
+                    if (payload.path === "/") {
+                        currentHb = payload.data && typeof payload.data === "object"
+                            ? payload.data.heartbeat
+                            : payload.data;
+                    } else if (payload.path === "/heartbeat") {
+                        currentHb = payload.data;
+                    }
+
+                    // Snapshot pertama saat halaman baru dibuka (nilai heartbeat lama sebelum web dibuka)
+                    if (initialHeartbeat === undefined) {
+                        initialHeartbeat = currentHb ?? null;
+                        kickWatchdog(INITIAL_CHECK_MS);
+                        return;
+                    }
+
+                    // Begitu nilai heartbeat baru masuk dari ESP32 -> langsung nyatakan TERHUBUNG!
+                    if (currentHb !== null && currentHb !== undefined && currentHb !== initialHeartbeat) {
+                        initialHeartbeat = currentHb;
+                        setState(true);
+                        kickWatchdog(OFFLINE_TIMEOUT_MS);
+                    }
+                } catch (err) {
+                    console.error("Error parsing heartbeat ESP32:", err);
+                }
+            };
+
+            statusStream.addEventListener('put', onHeartbeatPacket);
+            statusStream.addEventListener('patch', onHeartbeatPacket);
+
+            window.addEventListener('beforeunload', () => {
+                statusStream.close();
+            });
+
+            return {
+                setSimulatedState(connected) {
+                    clearTimeout(watchdogTimer);
+                    setState(connected);
+                }
+            };
+        })();
+
+        // =========================================================================
+        // MODUL B (TERPISAH): KONTROLER PEMBACAAN NILAI SENSOR
+        // Mendengarkan /Sensor.json (/Sensor/Suhu, Kelembapan, Gas, Jarak)
+        // =========================================================================
+        const SensorMonitorController = (() => {
+            const INITIAL_CHECK_MS = 4500;
+            const SENSOR_STALE_MS = 7500; // Jika 7.5 detik tidak ada pembaruan sensor -> Tidak Terbaca
+
+            let readings = { Suhu: null, Kelembapan: null, Gas: null, Jarak: null };
+            let initialSnapshot = undefined;
+            let lastSensorToastKey = null;
+            let staleTimer = null;
+
+            const banner = document.getElementById('sensor-banner');
+            const icon = document.getElementById('sensor-banner-icon');
+            const title = document.getElementById('sensor-banner-title');
+            const desc = document.getElementById('sensor-banner-desc');
+            const tag = document.getElementById('sensor-banner-tag');
+            const grid = document.getElementById('sensor-grid');
+            const lastUpdateText = document.getElementById('last-update');
+
+            function isValidReading(val) {
+                if (val === null || val === undefined || val === "") return false;
+                const num = Number(val);
+                // Nilai -999 dikirim ESP32 saat DHT22 isnan atau HC-SR04 timeout
+                return Number.isFinite(num) && num > -100;
+            }
+
+            function renderBanner(variant, heading, subtitle, tagLabel, stateKey) {
+                banner.className = `notif-bar state-${variant}`;
+                title.textContent = heading;
+                desc.textContent = subtitle;
+                tag.textContent = tagLabel;
+
+                if (variant === 'green') {
+                    icon.innerHTML = `
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>`;
+                    grid.classList.remove("device-offline");
+                } else if (variant === 'warn') {
+                    icon.innerHTML = `
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>`;
+                    grid.classList.remove("device-offline");
+                } else {
+                    icon.innerHTML = `
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>`;
+                    grid.classList.add("device-offline");
+                }
+
+                if (lastSensorToastKey !== stateKey) {
+                    lastSensorToastKey = stateKey;
+                    showToast('SENSOR', variant, heading, subtitle);
+                    if (variant === 'warn') {
+                        playAlarmSound('sensor-alert');
+                    }
+                }
+            }
+
+            function setSingleCardOffline(idPrefix, badgeId) {
+                const circle = document.getElementById(`circle-${idPrefix}`);
+                const textVal = document.getElementById(`val-${idPrefix}`);
+                const badgeEl = document.getElementById(badgeId);
 
                 if (circle) {
                     circle.setAttribute('stroke-dasharray', '0, 100');
@@ -1379,152 +1295,255 @@
                     badgeEl.textContent = 'Tidak Terbaca';
                     badgeEl.className = 'status-badge status-offline';
                 }
+            }
+
+            function updateGauge(idPrefix, value, min, max, alertColor = null) {
+                let percentage = ((value - min) / (max - min)) * 100;
+                percentage = Math.min(100, Math.max(0, percentage));
+
+                const circle = document.getElementById(`circle-${idPrefix}`);
+                const textVal = document.getElementById(`val-${idPrefix}`);
+
+                if (circle && textVal) {
+                    circle.setAttribute('stroke-dasharray', `${percentage.toFixed(1)}, 100`);
+                    circle.style.stroke = alertColor ? alertColor : "";
+                    textVal.textContent = Number.isInteger(value) ? value : value.toFixed(1);
+                }
+            }
+
+            function markAllSensorsUnreadable(reasonText) {
+                readings = { Suhu: null, Kelembapan: null, Gas: null, Jarak: null };
+                setSingleCardOffline('temp', 'status-temp');
+                setSingleCardOffline('hum', 'status-hum');
+                setSingleCardOffline('gas', 'status-gas');
+                setSingleCardOffline('dist', 'status-dist');
+
+                renderBanner(
+                    'red',
+                    'Sensor Tidak Terbaca',
+                    reasonText || 'Tidak ada data nilai sensor yang masuk dari jalur telemetri.',
+                    'TIDAK TERBACA',
+                    'all-unreadable'
+                );
+            }
+
+            function processSensorReadings() {
+                const missing = [];
+                if (!isValidReading(readings.Suhu)) {
+                    missing.push('Suhu (DHT22)');
+                    setSingleCardOffline('temp', 'status-temp');
+                }
+                if (!isValidReading(readings.Kelembapan)) {
+                    missing.push('Kelembapan (DHT22)');
+                    setSingleCardOffline('hum', 'status-hum');
+                }
+                if (!isValidReading(readings.Gas)) {
+                    missing.push('Gas/Asap (MQ-2)');
+                    setSingleCardOffline('gas', 'status-gas');
+                }
+                if (!isValidReading(readings.Jarak)) {
+                    missing.push('Jarak (HC-SR04)');
+                    setSingleCardOffline('dist', 'status-dist');
+                }
+
+                const detections = [];
+
+                if (isValidReading(readings.Suhu)) {
+                    const suhu = Number(readings.Suhu);
+                    const overheat = suhu > 35;
+                    updateGauge('temp', suhu, 0, 50, overheat ? "#dc2626" : null);
+                    const badge = document.getElementById('status-temp');
+                    badge.textContent = overheat ? "Overheat!" : "Suhu Aman";
+                    badge.className = overheat ? "status-badge status-danger" : "status-badge";
+                    if (overheat) detections.push(`Suhu Tinggi (${suhu}°C)`);
+                }
+
+                if (isValidReading(readings.Kelembapan)) {
+                    const hum = Number(readings.Kelembapan);
+                    const humWarn = hum > HUMIDITY_HIGH_VAL || hum < 30;
+                    updateGauge('hum', hum, 0, 100, humWarn ? "#d97706" : null);
+                    const badge = document.getElementById('status-hum');
+                    if (hum > HUMIDITY_HIGH_VAL) {
+                        badge.textContent = "Terlalu Lembap";
+                        badge.className = "status-badge status-warning";
+                        detections.push(`Kelembapan Tinggi (${hum}%)`);
+                    } else if (hum < 30) {
+                        badge.textContent = "Udara Kering";
+                        badge.className = "status-badge status-warning";
+                        detections.push(`Udara Kering (${hum}%)`);
+                    } else {
+                        badge.textContent = "Normal";
+                        badge.className = "status-badge";
+                    }
+                }
+
+                if (isValidReading(readings.Gas)) {
+                    const gas = Number(readings.Gas);
+                    const gasDanger = gas > GAS_THRESHOLD_VAL;
+                    updateGauge('gas', gas, 0, 4095, gasDanger ? "#dc2626" : null);
+                    const badge = document.getElementById('status-gas');
+                    badge.textContent = gasDanger ? "Deteksi Gas / Asap!" : "Udara Bersih";
+                    badge.className = gasDanger ? "status-badge status-danger" : "status-badge";
+                    if (gasDanger) detections.push(`Gas/Asap Terdeteksi (${gas} ADC)`);
+                }
+
+                if (isValidReading(readings.Jarak)) {
+                    const jarak = Number(readings.Jarak);
+                    const distDanger = jarak < 15;
+                    updateGauge('dist', jarak, 0, 200, distDanger ? "#dc2626" : null);
+                    const badge = document.getElementById('status-dist');
+                    badge.textContent = distDanger ? "Awas Tabrakan!" : "Jalan Aman";
+                    badge.className = distDanger ? "status-badge status-danger" : "status-badge";
+                    if (distDanger) detections.push(`Rintangan Dekat (${jarak} cm)`);
+                }
+
+                if (missing.length > 0) {
+                    renderBanner(
+                        'red',
+                        'Sensor Tidak Terbaca',
+                        `Sensor gagal terbaca pada: ${missing.join(', ')}.`,
+                        'TIDAK TERBACA',
+                        'missing-' + missing.join(',')
+                    );
+                } else if (detections.length > 0) {
+                    renderBanner(
+                        'warn',
+                        `Sensor Terdeteksi: ${detections.map(d => d.split(' (')[0]).join(', ')}`,
+                        `Hasil pembacaan aktif dengan deteksi: ${detections.join(' • ')}.`,
+                        'TERDETEKSI',
+                        'detected-' + detections.map(d => d.split(' (')[0]).join(',')
+                    );
+                } else {
+                    renderBanner(
+                        'green',
+                        'Sensor Terbaca',
+                        'Seluruh sensor (DHT22, MQ-2, HC-SR04) berhasil terbaca dengan nilai normal.',
+                        'SENSOR TERBACA',
+                        'readable-ok'
+                    );
+                }
+            }
+
+            function resetStaleTimer(ms = SENSOR_STALE_MS) {
+                clearTimeout(staleTimer);
+                staleTimer = setTimeout(() => {
+                    if (!isSimulationActive) {
+                        markAllSensorsUnreadable("Tidak ada pembaruan nilai sensor dari perangkat.");
+                    }
+                }, ms);
+            }
+
+            // Stream Khusus Pembacaan Nilai Sensor (/Sensor.json)
+            const sensorStream = new EventSource(`${FIREBASE_URL}${SENSOR_PATH}?auth=${FIREBASE_AUTH}`);
+            sensorStream.onopen = () => {
+                if (!isSimulationActive) resetStaleTimer(INITIAL_CHECK_MS);
+            };
+            sensorStream.onerror = () => {
+                if (!isSimulationActive) {
+                    markAllSensorsUnreadable("Koneksi jalur data sensor terputus.");
+                }
+            };
+
+            const onSensorPacket = (event) => {
+                if (isSimulationActive || !event.data) return;
+                try {
+                    const payload = JSON.parse(event.data);
+                    if (!payload) return;
+
+                    // Simpan snapshot cache awal saat halaman baru dibuka agar data lama tidak langsung dianggap live
+                    if (payload.path === "/" && initialSnapshot === undefined) {
+                        initialSnapshot = JSON.stringify(payload.data);
+                        if (payload.data && typeof payload.data === "object") {
+                            readings = {
+                                Suhu: payload.data.Suhu ?? null,
+                                Kelembapan: payload.data.Kelembapan ?? null,
+                                Gas: payload.data.Gas ?? null,
+                                Jarak: payload.data.Jarak ?? null
+                            };
+                        }
+                        resetStaleTimer(INITIAL_CHECK_MS);
+                        return;
+                    }
+
+                    if (payload.path === "/" && typeof payload.data === "object" && payload.data !== null) {
+                        const snap = JSON.stringify(payload.data);
+                        if (snap === initialSnapshot) return;
+                        initialSnapshot = snap;
+                        readings = {
+                            Suhu: payload.data.Suhu ?? readings.Suhu,
+                            Kelembapan: payload.data.Kelembapan ?? readings.Kelembapan,
+                            Gas: payload.data.Gas ?? readings.Gas,
+                            Jarak: payload.data.Jarak ?? readings.Jarak
+                        };
+                    } else {
+                        const key = payload.path.replace(/^\//, "");
+                        if (key in readings) {
+                            readings[key] = payload.data;
+                        }
+                    }
+
+                    lastUpdateText.textContent = `Update Data: ${formatTime24(new Date())}`;
+                    processSensorReadings();
+                    resetStaleTimer(SENSOR_STALE_MS);
+                } catch (err) {
+                    console.error("Error parsing data sensor:", err);
+                }
+            };
+
+            sensorStream.addEventListener('put', onSensorPacket);
+            sensorStream.addEventListener('patch', onSensorPacket);
+
+            window.addEventListener('beforeunload', () => {
+                sensorStream.close();
             });
-        }
 
-        function setSingleSensorUnreadable(idPrefix, badgeId) {
-            const circle = document.getElementById(`circle-${idPrefix}`);
-            const textVal = document.getElementById(`val-${idPrefix}`);
-            const badgeEl = document.getElementById(badgeId);
-
-            if (circle) {
-                circle.setAttribute('stroke-dasharray', '0, 100');
-                circle.style.stroke = '';
-            }
-            if (textVal) textVal.textContent = '--';
-            if (badgeEl) {
-                badgeEl.textContent = 'Tidak Terbaca';
-                badgeEl.className = 'status-badge status-offline';
-            }
-        }
-
-        function updateGauge(idPrefix, rawValue, min, max, alertColor = null) {
-            const value = Number(rawValue);
-            let percentage = ((value - min) / (max - min)) * 100;
-            percentage = Math.min(100, Math.max(0, percentage));
-
-            const circle = document.getElementById(`circle-${idPrefix}`);
-            const textVal = document.getElementById(`val-${idPrefix}`);
-
-            if (circle && textVal) {
-                circle.setAttribute('stroke-dasharray', `${percentage.toFixed(1)}, 100`);
-                circle.style.stroke = alertColor ? alertColor : "";
-                textVal.textContent = Number.isInteger(value) ? value : value.toFixed(1);
-            }
-
-            return value;
-        }
-
-        function updateDashboard() {
-            if (isEspConnected === false) return;
-
-            // 1. DHT22 Suhu (0 - 50 °C)
-            if (!isValidNumber(sensorData.Suhu)) {
-                setSingleSensorUnreadable('temp', 'status-temp');
-            } else {
-                const suhuVal = Number(sensorData.Suhu);
-                const isOverheat = suhuVal > 35;
-                updateGauge('temp', suhuVal, 0, 50, isOverheat ? "#dc2626" : null);
-                const badgeTemp = document.getElementById('status-temp');
-                if (isOverheat) {
-                    badgeTemp.textContent = "Overheat!";
-                    badgeTemp.className = "status-badge status-danger";
-                } else {
-                    badgeTemp.textContent = "Suhu Aman";
-                    badgeTemp.className = "status-badge";
+            return {
+                injectSimulatedData(data) {
+                    clearTimeout(staleTimer);
+                    readings = { ...data };
+                    lastUpdateText.textContent = `Update Data: ${formatTime24(new Date())}`;
+                    processSensorReadings();
+                },
+                setSimulatedOffline() {
+                    clearTimeout(staleTimer);
+                    markAllSensorsUnreadable("Mode simulasi dimatikan. Menunggu pembacaan sensor nyata...");
                 }
-            }
-
-            // 2. DHT22 Kelembapan (0 - 100 %)
-            if (!isValidNumber(sensorData.Kelembapan)) {
-                setSingleSensorUnreadable('hum', 'status-hum');
-            } else {
-                const humVal = Number(sensorData.Kelembapan);
-                const isHumWarn = humVal > 80 || humVal < 30;
-                updateGauge('hum', humVal, 0, 100, isHumWarn ? "#d97706" : null);
-                const badgeHum = document.getElementById('status-hum');
-                if (humVal > 80) {
-                    badgeHum.textContent = "Terlalu Lembap";
-                    badgeHum.className = "status-badge status-warning";
-                } else if (humVal < 30) {
-                    badgeHum.textContent = "Udara Kering";
-                    badgeHum.className = "status-badge status-warning";
-                } else {
-                    badgeHum.textContent = "Normal";
-                    badgeHum.className = "status-badge";
-                }
-            }
-
-            // 3. MQ-2 Gas / Asap (ADC ESP32: 0 - 4095)
-            if (!isValidNumber(sensorData.Gas)) {
-                setSingleSensorUnreadable('gas', 'status-gas');
-            } else {
-                const gasVal = Number(sensorData.Gas);
-                const isGasDanger = gasVal > 1500;
-                updateGauge('gas', gasVal, 0, 4095, isGasDanger ? "#dc2626" : null);
-                const badgeGas = document.getElementById('status-gas');
-                if (isGasDanger) {
-                    badgeGas.textContent = "Deteksi Gas / Asap!";
-                    badgeGas.className = "status-badge status-danger";
-                } else {
-                    badgeGas.textContent = "Udara Bersih";
-                    badgeGas.className = "status-badge";
-                }
-            }
-
-            // 4. HC-SR04 Jarak Rintangan (0 - 200 CM)
-            if (!isValidNumber(sensorData.Jarak)) {
-                setSingleSensorUnreadable('dist', 'status-dist');
-            } else {
-                const distVal = Number(sensorData.Jarak);
-                const isCollisionDanger = distVal < 15;
-                updateGauge('dist', distVal, 0, 200, isCollisionDanger ? "#dc2626" : null);
-                const badgeDist = document.getElementById('status-dist');
-                if (isCollisionDanger) {
-                    badgeDist.textContent = "Awas Tabrakan!";
-                    badgeDist.className = "status-badge status-danger";
-                } else {
-                    badgeDist.textContent = "Jalan Aman";
-                    badgeDist.className = "status-badge";
-                }
-            }
-        }
+            };
+        })();
 
         // ==========================================
-        // 6. MODE SIMULASI
+        // MODE SIMULASI (MENGUJI KEDUA MODUL)
         // ==========================================
         function toggleSimulation() {
             const btn = document.getElementById('sim-toggle');
-            if (simInterval) {
-                clearInterval(simInterval);
-                simInterval = null;
+            if (isSimulationActive) {
+                isSimulationActive = false;
+                clearInterval(simTimer);
+                simTimer = null;
                 btn.textContent = "Mode Simulasi: Off";
                 btn.classList.remove("active");
-                setEspConnectionState(false);
+
+                EspConnectionController.setSimulatedState(false);
+                SensorMonitorController.setSimulatedOffline();
             } else {
-                clearTimeout(watchdogTimer);
+                isSimulationActive = true;
                 btn.textContent = "Mode Simulasi: On";
                 btn.classList.add("active");
 
+                EspConnectionController.setSimulatedState(true);
+
                 const runStep = () => {
-                    sensorData = {
+                    SensorMonitorController.injectSimulatedData({
                         Suhu: +(26 + Math.random() * 11).toFixed(1),
                         Kelembapan: Math.floor(55 + Math.random() * 30),
-                        Gas: Math.floor(320 + Math.random() * 1350),
+                        Gas: Math.floor(420 + Math.random() * 1850),
                         Jarak: Math.floor(10 + Math.random() * 140)
-                    };
-                    lastUpdateText.textContent = `Update Data: ${formatTime24()}`;
-                    setEspConnectionState(true);
-                    updateDashboard();
+                    });
                 };
                 runStep();
-                simInterval = setInterval(runStep, 2500);
+                simTimer = setInterval(runStep, 2500);
             }
         }
-
-        window.addEventListener('beforeunload', () => {
-            eventSource.close();
-        });
     </script>
 </body>
 </html>
