@@ -777,7 +777,7 @@
                 <div id="esp-banner-tag" class="banner-right-tag">MENGECEK</div>
             </div>
 
-            <!-- BAR 2: MODUL PEMBACAAN NILAI SENSOR (Mendengarkan /Sensor) -->
+            <!-- BAR 2: MODUL PEMBACAAN NILAI SENSOR (DHT22 & MQ-2) -->
             <div id="sensor-banner" class="notif-bar state-checking" role="status">
                 <div class="banner-left">
                     <div id="sensor-banner-icon" class="banner-icon">
@@ -788,7 +788,7 @@
                     <div class="banner-text">
                         <span class="banner-category">Modul 2 • Status Pembacaan Sensor</span>
                         <h4 id="sensor-banner-title">Memeriksa Pembacaan Sensor...</h4>
-                        <p id="sensor-banner-desc">Menunggu hasil pembacaan sensor lingkungan & rintangan.</p>
+                        <p id="sensor-banner-desc">Menunggu hasil pembacaan sensor suhu, kelembapan, dan gas.</p>
                     </div>
                 </div>
                 <div id="sensor-banner-tag" class="banner-right-tag">MENGECEK</div>
@@ -888,7 +888,7 @@
                 <div id="status-gas" class="status-badge status-offline">Tidak Terbaca</div>
             </section>
 
-            <!-- 4. Sensor Jarak (HC-SR04) -->
+            <!-- 4. Sensor Jarak (HC-SR04) - Tampil di dashboard tanpa notifikasi spam -->
             <section class="card">
                 <svg class="card-leaf-watermark" viewBox="0 0 24 24" fill="#1b4332">
                     <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8Z"/>
@@ -1015,7 +1015,7 @@
                         osc.stop(now + idx * 0.16 + 0.3);
                     });
                 } else if (type === 'sensor-alert') {
-                    // Beep peringatan sensor mendeteksi bahaya
+                    // Beep peringatan sensor (Suhu, Kelembapan, Gas)
                     [880, 880].forEach((freq, idx) => {
                         const osc = audioCtx.createOscillator();
                         const gain = audioCtx.createGain();
@@ -1092,8 +1092,8 @@
         // Mendengarkan /ESP32_Status.json (/ESP32_Status/heartbeat dari ESP32)
         // =========================================================================
         const EspConnectionController = (() => {
-            const INITIAL_CHECK_MS = 4500;   // Verifikasi awal saat halaman dibuka (4.5 detik)
-            const OFFLINE_TIMEOUT_MS = 7000; // Jika 7 detik tidak ada heartbeat baru -> ESP32 Mati
+            const INITIAL_CHECK_MS = 4500;
+            const OFFLINE_TIMEOUT_MS = 7000;
 
             let isConnected = null;
             let initialHeartbeat = undefined;
@@ -1159,7 +1159,6 @@
                 }, ms);
             }
 
-            // Stream Khusus Heartbeat ESP32 (/ESP32_Status.json)
             const statusStream = new EventSource(`${FIREBASE_URL}${ESP_STATUS_PATH}?auth=${FIREBASE_AUTH}`);
             statusStream.onopen = () => {
                 if (!isSimulationActive && isConnected === null) {
@@ -1185,14 +1184,12 @@
                         currentHb = payload.data;
                     }
 
-                    // Snapshot pertama saat halaman baru dibuka (nilai heartbeat lama sebelum web dibuka)
                     if (initialHeartbeat === undefined) {
                         initialHeartbeat = currentHb ?? null;
                         kickWatchdog(INITIAL_CHECK_MS);
                         return;
                     }
 
-                    // Begitu nilai heartbeat baru masuk dari ESP32 -> langsung nyatakan TERHUBUNG!
                     if (currentHb !== null && currentHb !== undefined && currentHb !== initialHeartbeat) {
                         initialHeartbeat = currentHb;
                         setState(true);
@@ -1220,11 +1217,12 @@
 
         // =========================================================================
         // MODUL B (TERPISAH): KONTROLER PEMBACAAN NILAI SENSOR
-        // Mendengarkan /Sensor.json (/Sensor/Suhu, Kelembapan, Gas, Jarak)
+        // Notifikasi hanya untuk DHT22 (Suhu & Kelembapan) dan MQ-2 (Gas/Asap).
+        // Sensor Ultrasonik (HC-SR04) tetap tampil di kartu gauge tanpa notifikasi.
         // =========================================================================
         const SensorMonitorController = (() => {
             const INITIAL_CHECK_MS = 4500;
-            const SENSOR_STALE_MS = 7500; // Jika 7.5 detik tidak ada pembaruan sensor -> Tidak Terbaca
+            const SENSOR_STALE_MS = 7500;
 
             let readings = { Suhu: null, Kelembapan: null, Gas: null, Jarak: null };
             let initialSnapshot = undefined;
@@ -1242,7 +1240,6 @@
             function isValidReading(val) {
                 if (val === null || val === undefined || val === "") return false;
                 const num = Number(val);
-                // Nilai -999 dikirim ESP32 saat DHT22 isnan atau HC-SR04 timeout
                 return Number.isFinite(num) && num > -100;
             }
 
@@ -1328,6 +1325,7 @@
             }
 
             function processSensorReadings() {
+                // Validasi sensor yang masuk dalam sistem notifikasi (DHT22 & MQ-2 saja)
                 const missing = [];
                 if (!isValidReading(readings.Suhu)) {
                     missing.push('Suhu (DHT22)');
@@ -1341,13 +1339,14 @@
                     missing.push('Gas/Asap (MQ-2)');
                     setSingleCardOffline('gas', 'status-gas');
                 }
+                // HC-SR04 dikecualikan dari daftar notifikasi 'missing'
                 if (!isValidReading(readings.Jarak)) {
-                    missing.push('Jarak (HC-SR04)');
                     setSingleCardOffline('dist', 'status-dist');
                 }
 
                 const detections = [];
 
+                // 1. Suhu (DHT22) -> Masuk notifikasi
                 if (isValidReading(readings.Suhu)) {
                     const suhu = Number(readings.Suhu);
                     const overheat = suhu > 35;
@@ -1358,6 +1357,7 @@
                     if (overheat) detections.push(`Suhu Tinggi (${suhu}°C)`);
                 }
 
+                // 2. Kelembapan (DHT22) -> Masuk notifikasi
                 if (isValidReading(readings.Kelembapan)) {
                     const hum = Number(readings.Kelembapan);
                     const humWarn = hum > HUMIDITY_HIGH_VAL || hum < 30;
@@ -1377,6 +1377,7 @@
                     }
                 }
 
+                // 3. Gas / Asap (MQ-2) -> Masuk notifikasi
                 if (isValidReading(readings.Gas)) {
                     const gas = Number(readings.Gas);
                     const gasDanger = gas > GAS_THRESHOLD_VAL;
@@ -1387,6 +1388,7 @@
                     if (gasDanger) detections.push(`Gas/Asap Terdeteksi (${gas} ADC)`);
                 }
 
+                // 4. Jarak Rintangan (HC-SR04) -> Hanya tampil di kartu gauge, TIDAK memicu notifikasi
                 if (isValidReading(readings.Jarak)) {
                     const jarak = Number(readings.Jarak);
                     const distDanger = jarak < 15;
@@ -1394,7 +1396,6 @@
                     const badge = document.getElementById('status-dist');
                     badge.textContent = distDanger ? "Awas Tabrakan!" : "Jalan Aman";
                     badge.className = distDanger ? "status-badge status-danger" : "status-badge";
-                    if (distDanger) detections.push(`Rintangan Dekat (${jarak} cm)`);
                 }
 
                 if (missing.length > 0) {
@@ -1417,7 +1418,7 @@
                     renderBanner(
                         'green',
                         'Sensor Terbaca',
-                        'Seluruh sensor (DHT22, MQ-2, HC-SR04) berhasil terbaca dengan nilai normal.',
+                        'Sensor DHT22 (Suhu & Kelembapan) dan MQ-2 (Gas/Asap) terbaca dengan nilai normal.',
                         'SENSOR TERBACA',
                         'readable-ok'
                     );
@@ -1433,7 +1434,6 @@
                 }, ms);
             }
 
-            // Stream Khusus Pembacaan Nilai Sensor (/Sensor.json)
             const sensorStream = new EventSource(`${FIREBASE_URL}${SENSOR_PATH}?auth=${FIREBASE_AUTH}`);
             sensorStream.onopen = () => {
                 if (!isSimulationActive) resetStaleTimer(INITIAL_CHECK_MS);
@@ -1450,7 +1450,6 @@
                     const payload = JSON.parse(event.data);
                     if (!payload) return;
 
-                    // Simpan snapshot cache awal saat halaman baru dibuka agar data lama tidak langsung dianggap live
                     if (payload.path === "/" && initialSnapshot === undefined) {
                         initialSnapshot = JSON.stringify(payload.data);
                         if (payload.data && typeof payload.data === "object") {
