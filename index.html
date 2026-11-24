@@ -12,7 +12,7 @@
             --bg-top: #eef8f2;
             --bg-mid: #dff2e7;
             --bg-bottom: #cde7d8;
-            --card-bg: rgba(255, 255, 255, 0.82);
+            --card-bg: rgba(255, 255, 255, 0.84);
             --card-border: rgba(45, 106, 79, 0.16);
             --card-shadow: 0 14px 34px rgba(27, 67, 50, 0.08);
             --text-dark: #143627;
@@ -37,7 +37,9 @@
         }
 
         body {
-            background: linear-gradient(155deg, var(--bg-top) 0%, var(--bg-mid) 52%, var(--bg-bottom) 100%);
+            background: linear-gradient(135deg, #eef8f2 0%, #d8f3dc 35%, #cde7d8 70%, #e6f6ec 100%);
+            background-size: 240% 240%;
+            animation: bgGradientShift 16s ease-in-out infinite alternate;
             font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
             color: var(--text-dark);
             margin: 0;
@@ -50,16 +52,41 @@
             overflow-x: hidden;
         }
 
-        /* Efek Cahaya Matahari Pagi Tropis */
+        @keyframes bgGradientShift {
+            0%   { background-position: 0% 20%; }
+            50%  { background-position: 100% 60%; }
+            100% { background-position: 25% 100%; }
+        }
+
+        /* Efek Cahaya Matahari Pagi Tropis Bergerak */
         .sunbeam-glow {
             position: fixed;
             top: -140px;
             right: -120px;
-            width: 520px;
-            height: 520px;
-            background: radial-gradient(circle, rgba(253, 230, 138, 0.42) 0%, rgba(116, 198, 157, 0.12) 45%, transparent 70%);
+            width: 560px;
+            height: 560px;
+            background: radial-gradient(circle, rgba(253, 230, 138, 0.48) 0%, rgba(116, 198, 157, 0.16) 45%, transparent 70%);
             pointer-events: none;
             z-index: 0;
+            animation: sunbeamDrift 11s ease-in-out infinite alternate;
+        }
+
+        .sunbeam-glow-secondary {
+            position: fixed;
+            bottom: -180px;
+            left: -140px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(116, 198, 157, 0.28) 0%, rgba(82, 183, 136, 0.1) 50%, transparent 72%);
+            pointer-events: none;
+            z-index: 0;
+            animation: sunbeamDrift 14s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes sunbeamDrift {
+            0%   { transform: translate(0, 0) scale(1); opacity: 0.85; }
+            50%  { transform: translate(-28px, 22px) scale(1.08); opacity: 1; }
+            100% { transform: translate(18px, -16px) scale(0.95); opacity: 0.8; }
         }
 
         /* Dekorasi Dedaunan Sudut */
@@ -106,35 +133,40 @@
         }
 
         @keyframes tropicalBreeze {
-            0%   { transform: rotate(-2deg) scale(1); }
-            50%  { transform: rotate(2.5deg) scale(1.02); }
-            100% { transform: rotate(-1deg) scale(0.99); }
+            0%   { transform: rotate(-2.5deg) scale(1); }
+            50%  { transform: rotate(3deg) scale(1.03); }
+            100% { transform: rotate(-1.5deg) scale(0.99); }
         }
 
-        /* Partikel Embun Melayang */
+        /* Partikel Embun & Cahaya Tropis Melayang */
         .dew-particles span {
             position: fixed;
-            bottom: -20px;
+            bottom: -24px;
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.85), rgba(116, 198, 157, 0.35));
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.92), rgba(116, 198, 157, 0.42));
+            box-shadow: 0 0 10px rgba(116, 198, 157, 0.35);
             pointer-events: none;
             z-index: 0;
             animation: floatDew 14s linear infinite;
         }
 
-        .dew-particles span:nth-child(1) { left: 12%; width: 7px; height: 7px; animation-duration: 13s; animation-delay: 0s; }
-        .dew-particles span:nth-child(2) { left: 28%; width: 11px; height: 11px; animation-duration: 17s; animation-delay: 3s; }
-        .dew-particles span:nth-child(3) { left: 52%; width: 6px; height: 6px; animation-duration: 12s; animation-delay: 6s; }
-        .dew-particles span:nth-child(4) { left: 74%; width: 10px; height: 10px; animation-duration: 16s; animation-delay: 2s; }
-        .dew-particles span:nth-child(5) { left: 89%; width: 8px; height: 8px; animation-duration: 15s; animation-delay: 5s; }
+        .dew-particles span:nth-child(1)  { left: 8%;  width: 7px;  height: 7px;  animation-duration: 13s; animation-delay: 0s; }
+        .dew-particles span:nth-child(2)  { left: 19%; width: 12px; height: 12px; animation-duration: 18s; animation-delay: 2s; }
+        .dew-particles span:nth-child(3)  { left: 31%; width: 6px;  height: 6px;  animation-duration: 11s; animation-delay: 5s; }
+        .dew-particles span:nth-child(4)  { left: 44%; width: 10px; height: 10px; animation-duration: 16s; animation-delay: 1s; }
+        .dew-particles span:nth-child(5)  { left: 56%; width: 8px;  height: 8px;  animation-duration: 14s; animation-delay: 4s; }
+        .dew-particles span:nth-child(6)  { left: 68%; width: 13px; height: 13px; animation-duration: 19s; animation-delay: 3s; }
+        .dew-particles span:nth-child(7)  { left: 79%; width: 7px;  height: 7px;  animation-duration: 12s; animation-delay: 6s; }
+        .dew-particles span:nth-child(8)  { left: 91%; width: 9px;  height: 9px;  animation-duration: 15s; animation-delay: 2.5s; }
 
         @keyframes floatDew {
-            0% { transform: translateY(0) translateX(0) scale(0.8); opacity: 0; }
-            20% { opacity: 0.75; }
-            80% { opacity: 0.5; }
-            100% { transform: translateY(-105vh) translateX(28px) scale(1.15); opacity: 0; }
+            0%   { transform: translateY(0) translateX(0) scale(0.75); opacity: 0; }
+            15%  { opacity: 0.8; }
+            50%  { transform: translateY(-52vh) translateX(-18px) scale(1.05); }
+            85%  { opacity: 0.55; }
+            100% { transform: translateY(-106vh) translateX(26px) scale(1.2); opacity: 0; }
         }
 
         /* Konten Utama */
@@ -152,6 +184,12 @@
             text-align: center;
             margin-bottom: 22px;
             width: 100%;
+            animation: fadeSlideDown 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes fadeSlideDown {
+            from { opacity: 0; transform: translateY(-16px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         .top-meta-bar {
@@ -161,6 +199,24 @@
             gap: 10px;
             flex-wrap: wrap;
             margin-bottom: 12px;
+        }
+
+        .brand-pill,
+        .realtime-clock-pill {
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+        }
+
+        .brand-pill:hover,
+        .realtime-clock-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(27, 67, 50, 0.1);
+        }
+
+        .brand-pill:active,
+        .realtime-clock-pill:active {
+            transform: scale(0.95);
         }
 
         .brand-pill {
@@ -237,9 +293,12 @@
             border-radius: 999px;
             font-weight: 600;
             font-variant-numeric: tabular-nums;
+            transition: transform 0.25s ease, border-color 0.25s ease;
         }
 
         .pill-btn {
+            position: relative;
+            overflow: hidden;
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -252,12 +311,22 @@
             padding: 7px 15px;
             border-radius: 999px;
             cursor: pointer;
-            transition: all 0.25s ease;
+            user-select: none;
+            transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+                        background-color 0.25s ease,
+                        color 0.25s ease,
+                        box-shadow 0.25s ease;
         }
 
         .pill-btn:hover {
             background: var(--leaf-main);
             color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(45, 106, 79, 0.22);
+        }
+
+        .pill-btn:active {
+            transform: scale(0.94);
         }
 
         .pill-btn.active {
@@ -284,6 +353,8 @@
         }
 
         .notif-bar {
+            position: relative;
+            overflow: hidden;
             width: 100%;
             padding: 14px 20px;
             border-radius: 18px;
@@ -293,8 +364,26 @@
             gap: 14px;
             flex-wrap: wrap;
             backdrop-filter: blur(12px);
-            transition: all 0.35s ease;
+            cursor: pointer;
+            user-select: none;
+            animation: cardEntrance 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+                        box-shadow 0.35s ease,
+                        background-color 0.35s ease,
+                        border-color 0.35s ease;
             box-shadow: 0 8px 22px rgba(27, 67, 50, 0.05);
+        }
+
+        .notif-bar:nth-child(1) { animation-delay: 0.06s; }
+        .notif-bar:nth-child(2) { animation-delay: 0.14s; }
+
+        .notif-bar:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 26px rgba(27, 67, 50, 0.11);
+        }
+
+        .notif-bar:active {
+            transform: scale(0.988);
         }
 
         .notif-bar.state-checking {
@@ -338,6 +427,11 @@
             place-items: center;
             flex-shrink: 0;
             background: rgba(255, 255, 255, 0.82);
+            transition: transform 0.3s ease;
+        }
+
+        .notif-bar:hover .banner-icon {
+            transform: scale(1.08) rotate(-4deg);
         }
 
         .banner-text {
@@ -464,10 +558,12 @@
             font-size: 1.15rem;
             line-height: 1;
             padding: 0 2px;
+            transition: transform 0.2s ease, opacity 0.2s ease;
         }
 
         .toast-close:hover {
             opacity: 1;
+            transform: scale(1.2);
         }
 
         @keyframes slideInToast {
@@ -475,7 +571,9 @@
             to   { opacity: 1; transform: translateX(0) scale(1); }
         }
 
-        /* Grid Kartu Sensor */
+        /* =========================================================
+           GRID & KARTU SENSOR (ANIMASI MASUK, HOVER SHIMMER & PULSE)
+           ========================================================= */
         .grid-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
@@ -485,7 +583,7 @@
         }
 
         .grid-container.device-offline .card {
-            opacity: 0.8;
+            opacity: 0.82;
         }
 
         .card {
@@ -499,17 +597,93 @@
             box-shadow: var(--card-shadow);
             text-align: center;
             overflow: hidden;
-            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+            cursor: pointer;
+            user-select: none;
+            animation: cardEntrance 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+            transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
                         box-shadow 0.3s ease,
                         border-color 0.3s ease,
                         opacity 0.3s ease;
         }
 
+        .grid-container .card:nth-child(1) { animation-delay: 0.18s; }
+        .grid-container .card:nth-child(2) { animation-delay: 0.27s; }
+        .grid-container .card:nth-child(3) { animation-delay: 0.36s; }
+        .grid-container .card:nth-child(4) { animation-delay: 0.45s; }
+
+        @keyframes cardEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(24px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Efek kilauan cahaya menyapu kartu saat di-hover */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -120%;
+            width: 65%;
+            height: 100%;
+            background: linear-gradient(
+                120deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.55) 50%,
+                transparent 100%
+            );
+            transform: skewX(-22deg);
+            pointer-events: none;
+            transition: left 0.65s ease;
+            z-index: 2;
+        }
+
+        .card:hover::before {
+            left: 145%;
+        }
+
         .card:hover {
-            transform: translateY(-6px);
-            border-color: rgba(64, 145, 108, 0.45);
-            box-shadow: 0 18px 38px rgba(27, 67, 50, 0.14);
+            transform: translateY(-8px) scale(1.015);
+            border-color: rgba(64, 145, 108, 0.5);
+            box-shadow: 0 20px 42px rgba(27, 67, 50, 0.15);
             opacity: 1 !important;
+        }
+
+        .card:active {
+            transform: scale(0.965);
+        }
+
+        /* Animasi denyut halus saat data baru masuk dari Firebase */
+        .card.data-updated {
+            animation: cardDataFlash 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @keyframes cardDataFlash {
+            0%   { box-shadow: 0 14px 34px rgba(27, 67, 50, 0.08); }
+            45%  { box-shadow: 0 0 0 5px rgba(64, 145, 108, 0.24), 0 18px 38px rgba(27, 67, 50, 0.16); border-color: rgba(64, 145, 108, 0.65); }
+            100% { box-shadow: 0 14px 34px rgba(27, 67, 50, 0.08); }
+        }
+
+        /* Gelombang Ripple Saat Kartu/Tombol Dipencet */
+        .click-ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            background: radial-gradient(circle, rgba(64, 145, 108, 0.34) 0%, rgba(116, 198, 157, 0.12) 70%, transparent 100%);
+            animation: rippleExpand 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        @keyframes rippleExpand {
+            to {
+                transform: scale(3.5);
+                opacity: 0;
+            }
         }
 
         .card-leaf-watermark {
@@ -520,12 +694,12 @@
             height: 95px;
             opacity: 0.06;
             pointer-events: none;
-            transition: transform 0.4s ease, opacity 0.4s ease;
+            transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
         }
 
         .card:hover .card-leaf-watermark {
-            transform: rotate(-8deg) scale(1.08);
-            opacity: 0.11;
+            transform: rotate(-12deg) scale(1.14);
+            opacity: 0.13;
         }
 
         .card-top {
@@ -552,6 +726,13 @@
             background: rgba(64, 145, 108, 0.12);
             color: var(--leaf-main);
             flex-shrink: 0;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .card:hover .sensor-icon {
+            transform: rotate(-8deg) scale(1.12);
+            background: var(--leaf-main);
+            color: #ffffff;
         }
 
         .card h3 {
@@ -572,6 +753,11 @@
             letter-spacing: 0.3px;
             white-space: nowrap;
             flex-shrink: 0;
+            transition: transform 0.25s ease, background-color 0.25s ease;
+        }
+
+        .card:hover .sensor-chip {
+            background: rgba(45, 106, 79, 0.16);
         }
 
         /* Indikator Melingkar (SVG) */
@@ -580,6 +766,11 @@
             margin: 6px auto 8px;
             width: 168px;
             height: 168px;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .card:hover .gauge-wrapper {
+            transform: scale(1.04);
         }
 
         .circular-chart {
@@ -598,7 +789,7 @@
             fill: none;
             stroke-width: 3.4;
             stroke-linecap: round;
-            transition: stroke-dasharray 0.65s cubic-bezier(0.22, 1, 0.36, 1), stroke 0.35s ease;
+            transition: stroke-dasharray 0.7s cubic-bezier(0.22, 1, 0.36, 1), stroke 0.35s ease;
         }
 
         .color-temp { stroke: #e07a5f; }
@@ -679,8 +870,10 @@
 
     <!-- Efek Pencahayaan Matahari Tropis & Partikel Embun -->
     <div class="sunbeam-glow"></div>
+    <div class="sunbeam-glow-secondary"></div>
     <div class="dew-particles" aria-hidden="true">
-        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
     </div>
 
     <!-- Dekorasi Dedaunan Tropis (SVG) -->
@@ -716,7 +909,7 @@
     <div class="main-wrapper">
         <header class="header">
             <div class="top-meta-bar">
-                <div class="brand-pill">
+                <div class="brand-pill interactive-tap" data-sfx="tap">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
                         <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
@@ -725,7 +918,7 @@
                 </div>
 
                 <!-- Jam & Tanggal Real-Time -->
-                <div class="realtime-clock-pill" title="Waktu Sistem Real-Time">
+                <div class="realtime-clock-pill interactive-tap" data-sfx="tap" title="Waktu Sistem Real-Time">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"/>
                         <polyline points="12 6 12 12 16 14"/>
@@ -761,7 +954,7 @@
         <!-- 2 BAR NOTIFIKASI TERPISAH -->
         <div class="banners-stack">
             <!-- BAR 1: MODUL KONEKSI PERANGKAT ESP32 (Mendengarkan /ESP32_Status) -->
-            <div id="esp-banner" class="notif-bar state-checking" role="status">
+            <div id="esp-banner" class="notif-bar state-checking interactive-tap" data-sfx="card" role="status">
                 <div class="banner-left">
                     <div id="esp-banner-icon" class="banner-icon">
                         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
@@ -778,7 +971,7 @@
             </div>
 
             <!-- BAR 2: MODUL PEMBACAAN NILAI SENSOR (DHT22 & MQ-2) -->
-            <div id="sensor-banner" class="notif-bar state-checking" role="status">
+            <div id="sensor-banner" class="notif-bar state-checking interactive-tap" data-sfx="card" role="status">
                 <div class="banner-left">
                     <div id="sensor-banner-icon" class="banner-icon">
                         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
@@ -797,7 +990,7 @@
 
         <main id="sensor-grid" class="grid-container">
             <!-- 1. Sensor Suhu (DHT22) -->
-            <section class="card">
+            <section id="card-temp" class="card interactive-tap" data-sfx="card">
                 <svg class="card-leaf-watermark" viewBox="0 0 24 24" fill="#1b4332">
                     <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8Z"/>
                 </svg>
@@ -827,7 +1020,7 @@
             </section>
 
             <!-- 2. Sensor Kelembapan (DHT22) -->
-            <section class="card">
+            <section id="card-hum" class="card interactive-tap" data-sfx="card">
                 <svg class="card-leaf-watermark" viewBox="0 0 24 24" fill="#1b4332">
                     <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8Z"/>
                 </svg>
@@ -857,7 +1050,7 @@
             </section>
 
             <!-- 3. Sensor Gas (MQ-2) -->
-            <section class="card">
+            <section id="card-gas" class="card interactive-tap" data-sfx="card">
                 <svg class="card-leaf-watermark" viewBox="0 0 24 24" fill="#1b4332">
                     <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8Z"/>
                 </svg>
@@ -889,7 +1082,7 @@
             </section>
 
             <!-- 4. Sensor Jarak (HC-SR04) - Tampil di dashboard tanpa notifikasi spam -->
-            <section class="card">
+            <section id="card-dist" class="card interactive-tap" data-sfx="card">
                 <svg class="card-leaf-watermark" viewBox="0 0 24 24" fill="#1b4332">
                     <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8Z"/>
                 </svg>
@@ -959,7 +1152,9 @@
         updateRealtimeClock();
         setInterval(updateRealtimeClock, 1000);
 
-        // Sistem Alarm Suara (Web Audio API)
+        // ==========================================
+        // SISTEM AUDIO & SOUND EFFECT SAAT DIPENCET
+        // ==========================================
         let audioCtx = null;
         let alarmEnabled = true;
 
@@ -972,8 +1167,100 @@
                 audioCtx.resume();
             }
         }
-        ['click', 'touchstart', 'keydown'].forEach(evt => {
+        ['pointerdown', 'keydown'].forEach(evt => {
             window.addEventListener(evt, initAudioContext, { once: true });
+        });
+
+        // Efek suara klik / pencet tombol & kartu
+        function playPressSfx(variant = 'button') {
+            try {
+                initAudioContext();
+                if (!audioCtx) return;
+
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                if (variant === 'button') {
+                    // Suara pencet tombol: pop jernih naik
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(580, now);
+                    osc.frequency.exponentialRampToValueAtTime(920, now + 0.065);
+                    gain.gain.setValueAtTime(0.001, now);
+                    gain.gain.exponentialRampToValueAtTime(0.18, now + 0.01);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.085);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.09);
+                } else if (variant === 'card') {
+                    // Suara ketuk kartu / bar notifikasi: lembut & organik
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(420, now);
+                    osc.frequency.exponentialRampToValueAtTime(640, now + 0.075);
+                    gain.gain.setValueAtTime(0.001, now);
+                    gain.gain.exponentialRampToValueAtTime(0.14, now + 0.012);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.095);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } else {
+                    // Suara tap ringan (pill / close)
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(740, now);
+                    osc.frequency.exponentialRampToValueAtTime(480, now + 0.05);
+                    gain.gain.setValueAtTime(0.001, now);
+                    gain.gain.exponentialRampToValueAtTime(0.12, now + 0.008);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.07);
+                }
+            } catch (e) {
+                console.warn("Sound effect tidak dapat diputar:", e);
+            }
+        }
+
+        // Efek visual gelombang ripple saat elemen dipencet
+        function spawnRipple(targetEl, clientX, clientY) {
+            if (!targetEl || clientX === undefined || clientY === undefined) return;
+            const rect = targetEl.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height) * 0.65;
+            const ripple = document.createElement('span');
+            ripple.className = 'click-ripple';
+            ripple.style.width = `${size}px`;
+            ripple.style.height = `${size}px`;
+            ripple.style.left = `${clientX - rect.left - size / 2}px`;
+            ripple.style.top = `${clientY - rect.top - size / 2}px`;
+            targetEl.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 620);
+        }
+
+        // Pasang event suara + ripple ke seluruh tombol, kartu sensor, dan bar notifikasi
+        document.addEventListener('pointerdown', (e) => {
+            const btn = e.target.closest('.pill-btn');
+            if (btn) {
+                playPressSfx('button');
+                spawnRipple(btn, e.clientX, e.clientY);
+                return;
+            }
+
+            const closeBtn = e.target.closest('.toast-close');
+            if (closeBtn) {
+                playPressSfx('tap');
+                return;
+            }
+
+            const tapTarget = e.target.closest('.interactive-tap');
+            if (tapTarget) {
+                const sfxType = tapTarget.dataset.sfx || 'card';
+                playPressSfx(sfxType);
+                if (tapTarget.classList.contains('card') || tapTarget.classList.contains('notif-bar')) {
+                    spawnRipple(tapTarget, e.clientX, e.clientY);
+                }
+            }
         });
 
         function playAlarmSound(type = 'connected') {
@@ -1110,7 +1397,7 @@
                 isConnected = connected;
 
                 if (connected) {
-                    banner.className = "notif-bar state-green";
+                    banner.className = "notif-bar state-green interactive-tap";
                     icon.innerHTML = `
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
@@ -1131,7 +1418,7 @@
                         );
                     }
                 } else {
-                    banner.className = "notif-bar state-red";
+                    banner.className = "notif-bar state-red interactive-tap";
                     icon.innerHTML = `
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
@@ -1243,8 +1530,16 @@
                 return Number.isFinite(num) && num > -100;
             }
 
+            function flashCards() {
+                document.querySelectorAll('.card').forEach((card) => {
+                    card.classList.remove('data-updated');
+                    void card.offsetWidth;
+                    card.classList.add('data-updated');
+                });
+            }
+
             function renderBanner(variant, heading, subtitle, tagLabel, stateKey) {
-                banner.className = `notif-bar state-${variant}`;
+                banner.className = `notif-bar state-${variant} interactive-tap`;
                 title.textContent = heading;
                 desc.textContent = subtitle;
                 tag.textContent = tagLabel;
@@ -1325,7 +1620,8 @@
             }
 
             function processSensorReadings() {
-                // Validasi sensor yang masuk dalam sistem notifikasi (DHT22 & MQ-2 saja)
+                flashCards();
+
                 const missing = [];
                 if (!isValidReading(readings.Suhu)) {
                     missing.push('Suhu (DHT22)');
@@ -1339,7 +1635,6 @@
                     missing.push('Gas/Asap (MQ-2)');
                     setSingleCardOffline('gas', 'status-gas');
                 }
-                // HC-SR04 dikecualikan dari daftar notifikasi 'missing'
                 if (!isValidReading(readings.Jarak)) {
                     setSingleCardOffline('dist', 'status-dist');
                 }
