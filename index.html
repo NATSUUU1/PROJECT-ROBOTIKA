@@ -3,25 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Telemetri Mobil RC • Tropical Edition</title>
+    <title>Sistem Telemetri Mobil RC • Forest Edition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-top: #eef8f2;
-            --bg-mid: #dff2e7;
-            --bg-bottom: #cde7d8;
-            --card-bg: rgba(255, 255, 255, 0.84);
-            --card-border: rgba(45, 106, 79, 0.16);
-            --card-shadow: 0 14px 34px rgba(27, 67, 50, 0.08);
+            --card-bg: rgba(255, 255, 255, 0.88);
+            --card-border: rgba(45, 106, 79, 0.22);
+            --card-shadow: 0 16px 38px rgba(13, 40, 24, 0.16);
             --text-dark: #143627;
-            --text-muted: #4b7361;
+            --text-muted: #3d6352;
             --leaf-deep: #1b4332;
             --leaf-main: #2d6a4f;
             --leaf-fresh: #40916c;
             --leaf-mint: #74c69d;
-            --track-ring: rgba(45, 106, 79, 0.12);
+            --track-ring: rgba(45, 106, 79, 0.14);
             --safe-bg: #d8f3dc;
             --safe-text: #1b4332;
             --warn-bg: #fef0c7;
@@ -37,13 +34,21 @@
         }
 
         body {
-            background: linear-gradient(135deg, #eef8f2 0%, #d8f3dc 35%, #cde7d8 70%, #e6f6ec 100%);
-            background-size: 240% 240%;
-            animation: bgGradientShift 16s ease-in-out infinite alternate;
+            /* Gradien langit pagi menembus kanopi hutan */
+            background: linear-gradient(
+                180deg,
+                #e4f5ea 0%,
+                #ccebd7 26%,
+                #9fd3b6 54%,
+                #5c9e7d 80%,
+                #2d6a4f 100%
+            );
+            background-size: 180% 180%;
+            animation: forestSkyShift 18s ease-in-out infinite alternate;
             font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
             color: var(--text-dark);
             margin: 0;
-            padding: 28px 18px 48px;
+            padding: 28px 18px 56px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -52,45 +57,16 @@
             overflow-x: hidden;
         }
 
-        @keyframes bgGradientShift {
-            0%   { background-position: 0% 20%; }
-            50%  { background-position: 100% 60%; }
-            100% { background-position: 25% 100%; }
+        @keyframes forestSkyShift {
+            0%   { background-position: 50% 0%; }
+            50%  { background-position: 65% 25%; }
+            100% { background-position: 35% 10%; }
         }
 
-        /* Efek Cahaya Matahari Pagi Tropis Bergerak */
-        .sunbeam-glow {
-            position: fixed;
-            top: -140px;
-            right: -120px;
-            width: 560px;
-            height: 560px;
-            background: radial-gradient(circle, rgba(253, 230, 138, 0.48) 0%, rgba(116, 198, 157, 0.16) 45%, transparent 70%);
-            pointer-events: none;
-            z-index: 0;
-            animation: sunbeamDrift 11s ease-in-out infinite alternate;
-        }
-
-        .sunbeam-glow-secondary {
-            position: fixed;
-            bottom: -180px;
-            left: -140px;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(116, 198, 157, 0.28) 0%, rgba(82, 183, 136, 0.1) 50%, transparent 72%);
-            pointer-events: none;
-            z-index: 0;
-            animation: sunbeamDrift 14s ease-in-out infinite alternate-reverse;
-        }
-
-        @keyframes sunbeamDrift {
-            0%   { transform: translate(0, 0) scale(1); opacity: 0.85; }
-            50%  { transform: translate(-28px, 22px) scale(1.08); opacity: 1; }
-            100% { transform: translate(18px, -16px) scale(0.95); opacity: 0.8; }
-        }
-
-        /* Dekorasi Dedaunan Sudut */
-        .foliage-layer {
+        /* =========================================================
+           LATAR BELAKANG HUTAN BERLAPIS (SUNRAYS, TREES, MIST, FERNS)
+           ========================================================= */
+        .forest-backdrop {
             position: fixed;
             inset: 0;
             pointer-events: none;
@@ -98,75 +74,173 @@
             overflow: hidden;
         }
 
-        .leaf-decor {
+        /* Pendaran Cahaya Matahari & God-Rays di Celah Pohon */
+        .sunbeam-glow {
             position: absolute;
-            opacity: 0.22;
-            transform-origin: bottom left;
-            animation: tropicalBreeze 7s ease-in-out infinite alternate;
+            top: -150px;
+            right: -100px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(254, 243, 199, 0.65) 0%, rgba(167, 243, 208, 0.22) 45%, transparent 72%);
+            animation: sunbeamPulse 11s ease-in-out infinite alternate;
         }
 
-        .leaf-top-left {
-            top: -25px;
-            left: -30px;
-            width: 280px;
+        .forest-godrays {
+            position: absolute;
+            top: -15%;
+            right: -5%;
+            width: 120%;
+            height: 95%;
+            background: repeating-linear-gradient(
+                -26deg,
+                rgba(255, 251, 235, 0.16) 0px,
+                rgba(255, 251, 235, 0.16) 38px,
+                transparent 38px,
+                transparent 115px
+            );
+            mask-image: radial-gradient(ellipse at 82% 8%, black 15%, transparent 72%);
+            -webkit-mask-image: radial-gradient(ellipse at 82% 8%, black 15%, transparent 72%);
+            animation: godraySway 14s ease-in-out infinite alternate;
+        }
+
+        @keyframes sunbeamPulse {
+            0%   { transform: translate(0, 0) scale(1); opacity: 0.85; }
+            100% { transform: translate(-25px, 18px) scale(1.08); opacity: 1; }
+        }
+
+        @keyframes godraySway {
+            0%   { transform: skewX(-2deg) translateX(0); opacity: 0.7; }
+            100% { transform: skewX(3deg) translateX(-24px); opacity: 0.95; }
+        }
+
+        /* Lapisan Kabut Pagi Hutan */
+        .forest-mist {
+            position: absolute;
+            bottom: 14%;
+            left: -15%;
+            width: 130%;
+            height: 220px;
+            background: radial-gradient(ellipse at center, rgba(236, 253, 245, 0.45) 0%, rgba(209, 250, 229, 0.18) 50%, transparent 78%);
+            filter: blur(18px);
+            animation: mistDrift 20s ease-in-out infinite alternate;
+        }
+
+        .forest-mist.mist-lower {
+            bottom: 4%;
+            height: 160px;
+            opacity: 0.65;
+            animation-duration: 26s;
+            animation-direction: alternate-reverse;
+        }
+
+        @keyframes mistDrift {
+            0%   { transform: translateX(-4%) scaleY(1); }
+            100% { transform: translateX(4%) scaleY(1.08); }
+        }
+
+        /* Lapisan SVG Pemandangan Hutan */
+        .forest-scene-svg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 68vh;
+            min-height: 400px;
+        }
+
+        .forest-layer-far {
+            animation: forestBreezeFar 16s ease-in-out infinite alternate;
+            transform-origin: bottom center;
+        }
+
+        .forest-layer-mid {
+            animation: forestBreezeMid 12s ease-in-out infinite alternate;
+            transform-origin: bottom center;
+        }
+
+        .forest-layer-front {
+            animation: forestBreezeFront 9s ease-in-out infinite alternate;
+            transform-origin: bottom center;
+        }
+
+        @keyframes forestBreezeFar {
+            0%   { transform: translateX(0px); }
+            100% { transform: translateX(-10px); }
+        }
+
+        @keyframes forestBreezeMid {
+            0%   { transform: translateX(0px) skewX(0deg); }
+            100% { transform: translateX(8px) skewX(0.4deg); }
+        }
+
+        @keyframes forestBreezeFront {
+            0%   { transform: skewX(-0.5deg); }
+            100% { transform: skewX(0.6deg); }
+        }
+
+        /* Sulur & Dedaunan Kanopi Atas */
+        .canopy-top-left {
+            position: absolute;
+            top: -18px;
+            left: -24px;
+            width: 310px;
+            opacity: 0.34;
             transform-origin: top left;
-            animation-duration: 8s;
+            animation: canopySway 8s ease-in-out infinite alternate;
         }
 
-        .leaf-bottom-right {
-            bottom: -35px;
-            right: -25px;
-            width: 320px;
-            transform-origin: bottom right;
-            animation-duration: 9.5s;
-            animation-delay: -2s;
+        .canopy-top-right {
+            position: absolute;
+            top: -15px;
+            right: -20px;
+            width: 270px;
+            opacity: 0.28;
+            transform-origin: top right;
+            animation: canopySway 9.5s ease-in-out infinite alternate-reverse;
         }
 
-        .leaf-bottom-left {
-            bottom: -20px;
-            left: -20px;
-            width: 210px;
-            opacity: 0.15;
-            transform-origin: bottom left;
-            animation-duration: 6.5s;
-            animation-delay: -1s;
+        @keyframes canopySway {
+            0%   { transform: rotate(-2deg) scale(1); }
+            100% { transform: rotate(2.5deg) scale(1.03); }
         }
 
-        @keyframes tropicalBreeze {
-            0%   { transform: rotate(-2.5deg) scale(1); }
-            50%  { transform: rotate(3deg) scale(1.03); }
-            100% { transform: rotate(-1.5deg) scale(0.99); }
-        }
-
-        /* Partikel Embun & Cahaya Tropis Melayang */
-        .dew-particles span {
+        /* Partikel Kunang-Kunang & Embun Hutan */
+        .forest-particles span {
             position: fixed;
-            bottom: -24px;
-            width: 8px;
-            height: 8px;
+            bottom: -20px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.92), rgba(116, 198, 157, 0.42));
-            box-shadow: 0 0 10px rgba(116, 198, 157, 0.35);
             pointer-events: none;
             z-index: 0;
-            animation: floatDew 14s linear infinite;
+            animation: floatFirefly 15s linear infinite;
         }
 
-        .dew-particles span:nth-child(1)  { left: 8%;  width: 7px;  height: 7px;  animation-duration: 13s; animation-delay: 0s; }
-        .dew-particles span:nth-child(2)  { left: 19%; width: 12px; height: 12px; animation-duration: 18s; animation-delay: 2s; }
-        .dew-particles span:nth-child(3)  { left: 31%; width: 6px;  height: 6px;  animation-duration: 11s; animation-delay: 5s; }
-        .dew-particles span:nth-child(4)  { left: 44%; width: 10px; height: 10px; animation-duration: 16s; animation-delay: 1s; }
-        .dew-particles span:nth-child(5)  { left: 56%; width: 8px;  height: 8px;  animation-duration: 14s; animation-delay: 4s; }
-        .dew-particles span:nth-child(6)  { left: 68%; width: 13px; height: 13px; animation-duration: 19s; animation-delay: 3s; }
-        .dew-particles span:nth-child(7)  { left: 79%; width: 7px;  height: 7px;  animation-duration: 12s; animation-delay: 6s; }
-        .dew-particles span:nth-child(8)  { left: 91%; width: 9px;  height: 9px;  animation-duration: 15s; animation-delay: 2.5s; }
+        /* Kombinasi partikel embun putih & kunang-kunang keemasan */
+        .forest-particles span:nth-child(odd) {
+            background: radial-gradient(circle, rgba(254, 240, 138, 0.95), rgba(250, 204, 21, 0.25));
+            box-shadow: 0 0 12px rgba(253, 224, 71, 0.65);
+        }
 
-        @keyframes floatDew {
+        .forest-particles span:nth-child(even) {
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.9), rgba(116, 198, 157, 0.35));
+            box-shadow: 0 0 8px rgba(167, 243, 208, 0.45);
+        }
+
+        .forest-particles span:nth-child(1)  { left: 7%;  width: 6px;  height: 6px;  animation-duration: 14s; animation-delay: 0s; }
+        .forest-particles span:nth-child(2)  { left: 17%; width: 10px; height: 10px; animation-duration: 18s; animation-delay: 2s; }
+        .forest-particles span:nth-child(3)  { left: 29%; width: 7px;  height: 7px;  animation-duration: 12s; animation-delay: 4s; }
+        .forest-particles span:nth-child(4)  { left: 41%; width: 9px;  height: 9px;  animation-duration: 16s; animation-delay: 1s; }
+        .forest-particles span:nth-child(5)  { left: 54%; width: 6px;  height: 6px;  animation-duration: 13s; animation-delay: 5s; }
+        .forest-particles span:nth-child(6)  { left: 66%; width: 11px; height: 11px; animation-duration: 19s; animation-delay: 3s; }
+        .forest-particles span:nth-child(7)  { left: 78%; width: 7px;  height: 7px;  animation-duration: 15s; animation-delay: 6s; }
+        .forest-particles span:nth-child(8)  { left: 88%; width: 8px;  height: 8px;  animation-duration: 17s; animation-delay: 2.5s; }
+        .forest-particles span:nth-child(9)  { left: 94%; width: 6px;  height: 6px;  animation-duration: 11s; animation-delay: 4.5s; }
+
+        @keyframes floatFirefly {
             0%   { transform: translateY(0) translateX(0) scale(0.75); opacity: 0; }
-            15%  { opacity: 0.8; }
-            50%  { transform: translateY(-52vh) translateX(-18px) scale(1.05); }
-            85%  { opacity: 0.55; }
-            100% { transform: translateY(-106vh) translateX(26px) scale(1.2); opacity: 0; }
+            15%  { opacity: 0.9; }
+            50%  { transform: translateY(-50vh) translateX(-22px) scale(1.1); opacity: 0.65; }
+            85%  { opacity: 0.85; }
+            100% { transform: translateY(-106vh) translateX(24px) scale(1.2); opacity: 0; }
         }
 
         /* Konten Utama */
@@ -211,7 +285,7 @@
         .brand-pill:hover,
         .realtime-clock-pill:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(27, 67, 50, 0.1);
+            box-shadow: 0 6px 16px rgba(27, 67, 50, 0.14);
         }
 
         .brand-pill:active,
@@ -225,8 +299,9 @@
             gap: 6px;
             padding: 6px 14px;
             border-radius: 999px;
-            background: rgba(45, 106, 79, 0.1);
-            border: 1px solid rgba(45, 106, 79, 0.18);
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(45, 106, 79, 0.22);
             color: var(--leaf-main);
             font-size: 0.78rem;
             font-weight: 700;
@@ -241,14 +316,14 @@
             gap: 8px;
             padding: 6px 15px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.88);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(45, 106, 79, 0.22);
             color: var(--leaf-deep);
             font-size: 0.82rem;
             font-weight: 700;
             font-variant-numeric: tabular-nums;
-            box-shadow: 0 4px 12px rgba(27, 67, 50, 0.05);
+            box-shadow: 0 4px 12px rgba(27, 67, 50, 0.06);
         }
 
         .realtime-clock-pill svg {
@@ -261,18 +336,20 @@
         }
 
         .header h1 {
-            color: var(--leaf-deep);
+            color: #102a1e;
             margin: 0 0 6px 0;
             font-size: clamp(1.65rem, 3vw, 2.25rem);
             font-weight: 800;
             letter-spacing: -0.5px;
+            text-shadow: 0 2px 12px rgba(255, 255, 255, 0.75);
         }
 
         .header p {
-            color: var(--text-muted);
+            color: #1f4e39;
             margin: 0 0 18px 0;
             font-size: 0.95rem;
-            font-weight: 500;
+            font-weight: 600;
+            text-shadow: 0 1px 8px rgba(255, 255, 255, 0.7);
         }
 
         .status-bar {
@@ -285,8 +362,8 @@
 
         .last-update {
             font-size: 0.83rem;
-            color: var(--text-muted);
-            background: var(--card-bg);
+            color: var(--leaf-deep);
+            background: rgba(255, 255, 255, 0.86);
             backdrop-filter: blur(10px);
             border: 1px solid var(--card-border);
             padding: 7px 15px;
@@ -306,7 +383,7 @@
             font-size: 0.82rem;
             font-weight: 700;
             color: var(--leaf-main);
-            background: rgba(255, 255, 255, 0.88);
+            background: rgba(255, 255, 255, 0.9);
             border: 1px solid rgba(45, 106, 79, 0.28);
             padding: 7px 15px;
             border-radius: 999px;
@@ -322,7 +399,7 @@
             background: var(--leaf-main);
             color: #ffffff;
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(45, 106, 79, 0.22);
+            box-shadow: 0 6px 16px rgba(27, 67, 50, 0.24);
         }
 
         .pill-btn:active {
@@ -338,7 +415,7 @@
         .pill-btn.muted {
             color: var(--danger-text);
             border-color: rgba(220, 38, 38, 0.3);
-            background: rgba(254, 226, 226, 0.7);
+            background: rgba(254, 226, 226, 0.88);
         }
 
         /* =========================================================
@@ -363,7 +440,7 @@
             justify-content: space-between;
             gap: 14px;
             flex-wrap: wrap;
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(14px);
             cursor: pointer;
             user-select: none;
             animation: cardEntrance 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -371,7 +448,7 @@
                         box-shadow 0.35s ease,
                         background-color 0.35s ease,
                         border-color 0.35s ease;
-            box-shadow: 0 8px 22px rgba(27, 67, 50, 0.05);
+            box-shadow: 0 10px 26px rgba(13, 40, 24, 0.12);
         }
 
         .notif-bar:nth-child(1) { animation-delay: 0.06s; }
@@ -379,7 +456,7 @@
 
         .notif-bar:hover {
             transform: translateY(-3px);
-            box-shadow: 0 12px 26px rgba(27, 67, 50, 0.11);
+            box-shadow: 0 14px 30px rgba(13, 40, 24, 0.18);
         }
 
         .notif-bar:active {
@@ -387,30 +464,27 @@
         }
 
         .notif-bar.state-checking {
-            background: rgba(254, 240, 199, 0.88);
-            border: 1.5px solid rgba(217, 119, 6, 0.3);
+            background: rgba(254, 243, 199, 0.92);
+            border: 1.5px solid rgba(217, 119, 6, 0.35);
             color: #78350f;
         }
 
         .notif-bar.state-green {
-            background: rgba(209, 250, 229, 0.94);
-            border: 1.5px solid rgba(16, 185, 129, 0.45);
+            background: rgba(209, 250, 229, 0.95);
+            border: 1.5px solid rgba(16, 185, 129, 0.5);
             color: #065f46;
-            box-shadow: 0 10px 24px rgba(16, 185, 129, 0.1);
         }
 
         .notif-bar.state-warn {
-            background: rgba(254, 243, 199, 0.95);
-            border: 1.5px solid rgba(245, 158, 11, 0.48);
+            background: rgba(254, 243, 199, 0.96);
+            border: 1.5px solid rgba(245, 158, 11, 0.5);
             color: #92400e;
-            box-shadow: 0 10px 24px rgba(217, 119, 6, 0.11);
         }
 
         .notif-bar.state-red {
-            background: rgba(254, 226, 226, 0.95);
-            border: 1.5px solid rgba(220, 38, 38, 0.42);
+            background: rgba(254, 226, 226, 0.96);
+            border: 1.5px solid rgba(220, 38, 38, 0.45);
             color: #991b1b;
-            box-shadow: 0 10px 24px rgba(185, 28, 28, 0.11);
         }
 
         .banner-left {
@@ -426,7 +500,7 @@
             display: grid;
             place-items: center;
             flex-shrink: 0;
-            background: rgba(255, 255, 255, 0.82);
+            background: rgba(255, 255, 255, 0.86);
             transition: transform 0.3s ease;
         }
 
@@ -467,14 +541,14 @@
             font-weight: 800;
             padding: 6px 14px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.82);
+            background: rgba(255, 255, 255, 0.86);
             font-variant-numeric: tabular-nums;
             letter-spacing: 0.3px;
             white-space: nowrap;
         }
 
         /* =========================================================
-           POP-UP TOAST NOTIFICATION (2 KATEGORI BERBEDA)
+           POP-UP TOAST NOTIFICATION
            ========================================================= */
         .toast-container {
             position: fixed;
@@ -495,7 +569,7 @@
             padding: 13px 16px;
             border-radius: 16px;
             backdrop-filter: blur(14px);
-            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.16);
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.2);
             display: flex;
             align-items: flex-start;
             gap: 12px;
@@ -572,7 +646,7 @@
         }
 
         /* =========================================================
-           GRID & KARTU SENSOR (ANIMASI MASUK, HOVER SHIMMER & PULSE)
+           GRID & KARTU SENSOR
            ========================================================= */
         .grid-container {
             display: grid;
@@ -583,14 +657,14 @@
         }
 
         .grid-container.device-offline .card {
-            opacity: 0.82;
+            opacity: 0.88;
         }
 
         .card {
             position: relative;
             background: var(--card-bg);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--card-border);
             border-radius: 24px;
             padding: 22px 20px 24px;
@@ -622,7 +696,7 @@
             }
         }
 
-        /* Efek kilauan cahaya menyapu kartu saat di-hover */
+        /* Kilauan cahaya menyapu kartu saat di-hover */
         .card::before {
             content: '';
             position: absolute;
@@ -633,7 +707,7 @@
             background: linear-gradient(
                 120deg,
                 transparent 0%,
-                rgba(255, 255, 255, 0.55) 50%,
+                rgba(255, 255, 255, 0.6) 50%,
                 transparent 100%
             );
             transform: skewX(-22deg);
@@ -648,8 +722,8 @@
 
         .card:hover {
             transform: translateY(-8px) scale(1.015);
-            border-color: rgba(64, 145, 108, 0.5);
-            box-shadow: 0 20px 42px rgba(27, 67, 50, 0.15);
+            border-color: rgba(64, 145, 108, 0.55);
+            box-shadow: 0 22px 44px rgba(13, 40, 24, 0.22);
             opacity: 1 !important;
         }
 
@@ -657,15 +731,15 @@
             transform: scale(0.965);
         }
 
-        /* Animasi denyut halus saat data baru masuk dari Firebase */
+        /* Denyut saat data baru masuk dari Firebase */
         .card.data-updated {
             animation: cardDataFlash 0.55s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         @keyframes cardDataFlash {
-            0%   { box-shadow: 0 14px 34px rgba(27, 67, 50, 0.08); }
-            45%  { box-shadow: 0 0 0 5px rgba(64, 145, 108, 0.24), 0 18px 38px rgba(27, 67, 50, 0.16); border-color: rgba(64, 145, 108, 0.65); }
-            100% { box-shadow: 0 14px 34px rgba(27, 67, 50, 0.08); }
+            0%   { box-shadow: 0 16px 38px rgba(13, 40, 24, 0.16); }
+            45%  { box-shadow: 0 0 0 5px rgba(116, 198, 157, 0.36), 0 20px 42px rgba(13, 40, 24, 0.22); border-color: rgba(64, 145, 108, 0.7); }
+            100% { box-shadow: 0 16px 38px rgba(13, 40, 24, 0.16); }
         }
 
         /* Gelombang Ripple Saat Kartu/Tombol Dipencet */
@@ -723,7 +797,7 @@
             border-radius: 10px;
             display: grid;
             place-items: center;
-            background: rgba(64, 145, 108, 0.12);
+            background: rgba(64, 145, 108, 0.14);
             color: var(--leaf-main);
             flex-shrink: 0;
             transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s ease, color 0.3s ease;
@@ -747,7 +821,7 @@
             font-size: 0.68rem;
             font-weight: 700;
             color: var(--text-muted);
-            background: rgba(45, 106, 79, 0.08);
+            background: rgba(45, 106, 79, 0.1);
             padding: 3px 8px;
             border-radius: 8px;
             letter-spacing: 0.3px;
@@ -757,7 +831,7 @@
         }
 
         .card:hover .sensor-chip {
-            background: rgba(45, 106, 79, 0.16);
+            background: rgba(45, 106, 79, 0.18);
         }
 
         /* Indikator Melingkar (SVG) */
@@ -865,45 +939,151 @@
 </head>
 <body>
 
-    <!-- Container Pop-up Toast Notifikasi (Terpisah antara Koneksi ESP32 & Pembacaan Sensor) -->
+    <!-- Container Pop-up Toast Notifikasi -->
     <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
-    <!-- Efek Pencahayaan Matahari Tropis & Partikel Embun -->
-    <div class="sunbeam-glow"></div>
-    <div class="sunbeam-glow-secondary"></div>
-    <div class="dew-particles" aria-hidden="true">
-        <span></span><span></span><span></span><span></span>
+    <!-- Partikel Kunang-Kunang & Embun Hutan -->
+    <div class="forest-particles" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
         <span></span><span></span><span></span><span></span>
     </div>
 
-    <!-- Dekorasi Dedaunan Tropis (SVG) -->
-    <div class="foliage-layer" aria-hidden="true">
-        <svg class="leaf-decor leaf-top-left" viewBox="0 0 300 300" fill="none">
-            <path d="M10 10 C90 40, 170 110, 230 220" stroke="#1b4332" stroke-width="5" stroke-linecap="round"/>
-            <path d="M40 28 C95 10, 155 15, 200 35 C150 42, 95 45, 40 28 Z" fill="#2d6a4f"/>
-            <path d="M72 52 C135 40, 195 52, 245 82 C185 82, 125 75, 72 52 Z" fill="#40916c"/>
-            <path d="M105 82 C168 78, 225 98, 270 135 C210 128, 155 112, 105 82 Z" fill="#2d6a4f"/>
-            <path d="M138 118 C195 122, 242 148, 275 188 C222 174, 175 152, 138 118 Z" fill="#52b788"/>
-            <path d="M28 45 C12 105, 18 165, 42 215 C46 158, 44 102, 28 45 Z" fill="#40916c"/>
-            <path d="M58 75 C46 135, 58 195, 88 242 C85 185, 76 130, 58 75 Z" fill="#2d6a4f"/>
-            <path d="M92 110 C86 168, 104 222, 138 265 C128 212, 112 160, 92 110 Z" fill="#52b788"/>
+    <!-- =========================================================
+         BACKGROUND HUTAN TROPIS BERLAPIS (SVG + KABUT + CAHAYA)
+         ========================================================= -->
+    <div class="forest-backdrop" aria-hidden="true">
+        <div class="sunbeam-glow"></div>
+        <div class="forest-godrays"></div>
+
+        <!-- Kanopi & Sulur Daun Sudut Atas -->
+        <svg class="canopy-top-left" viewBox="0 0 320 300" fill="none">
+            <path d="M0 0 C95 35, 180 105, 250 225" stroke="#1b4332" stroke-width="5" stroke-linecap="round"/>
+            <path d="M35 22 C95 5, 160 12, 210 35 C155 42, 95 44, 35 22 Z" fill="#2d6a4f"/>
+            <path d="M70 48 C138 36, 202 50, 255 82 C192 82, 128 74, 70 48 Z" fill="#40916c"/>
+            <path d="M106 80 C172 76, 232 98, 280 138 C218 130, 160 112, 106 80 Z" fill="#2d6a4f"/>
+            <path d="M142 118 C202 122, 252 150, 286 192 C230 176, 180 154, 142 118 Z" fill="#52b788"/>
+            <path d="M25 42 C10 106, 16 170, 42 222 C46 162, 42 102, 25 42 Z" fill="#40916c"/>
+            <path d="M58 75 C46 138, 58 200, 90 250 C86 190, 76 132, 58 75 Z" fill="#2d6a4f"/>
+            <path d="M94 112 C88 172, 106 228, 142 272 C132 216, 114 164, 94 112 Z" fill="#52b788"/>
         </svg>
 
-        <svg class="leaf-decor leaf-bottom-right" viewBox="0 0 320 320" fill="none">
-            <path d="M300 305 C240 245, 185 185, 110 115" stroke="#1b4332" stroke-width="6" stroke-linecap="round"/>
-            <path d="M275 280 C305 210, 290 130, 235 80 C215 110, 235 125, 220 138 C205 150, 185 125, 175 100 C150 115, 165 140, 150 152 C135 162, 115 135, 95 115 C75 145, 80 190, 115 225 C145 255, 180 245, 195 260 C208 272, 185 288, 170 295 C210 310, 250 302, 275 280 Z" fill="#2d6a4f"/>
-            <ellipse cx="215" cy="185" rx="14" ry="8" transform="rotate(-35 215 185)" fill="#dff2e7"/>
-            <ellipse cx="172" cy="215" rx="13" ry="7" transform="rotate(-35 172 215)" fill="#dff2e7"/>
+        <svg class="canopy-top-right" viewBox="0 0 280 260" fill="none">
+            <path d="M280 0 C205 32, 140 92, 85 190" stroke="#1b4332" stroke-width="4.5" stroke-linecap="round"/>
+            <path d="M248 20 C192 6, 136 14, 92 34 C142 40, 195 40, 248 20 Z" fill="#2d6a4f"/>
+            <path d="M214 46 C154 36, 98 48, 52 78 C108 78, 164 70, 214 46 Z" fill="#40916c"/>
+            <path d="M180 76 C122 74, 72 94, 30 130 C84 122, 134 106, 180 76 Z" fill="#2d6a4f"/>
+            <path d="M254 40 C266 96, 260 152, 236 198 C232 146, 236 94, 254 40 Z" fill="#40916c"/>
         </svg>
 
-        <svg class="leaf-decor leaf-bottom-left" viewBox="0 0 220 220" fill="none">
-            <path d="M15 205 C65 145, 120 95, 190 45" stroke="#2d6a4f" stroke-width="4" stroke-linecap="round"/>
-            <path d="M45 172 C35 135, 45 105, 65 85 C62 115, 58 145, 45 172 Z" fill="#40916c"/>
-            <path d="M80 138 C75 102, 88 72, 112 55 C104 85, 95 112, 80 138 Z" fill="#52b788"/>
-            <path d="M118 104 C118 72, 134 46, 158 32 C146 58, 134 82, 118 104 Z" fill="#40916c"/>
-            <path d="M55 165 C92 168, 125 160, 150 142 C120 146, 88 152, 55 165 Z" fill="#2d6a4f"/>
-            <path d="M92 130 C128 130, 158 120, 180 100 C152 106, 122 115, 92 130 Z" fill="#40916c"/>
+        <!-- Kabut Pagi Tengah -->
+        <div class="forest-mist"></div>
+
+        <!-- Pemandangan Siluet Hutan & Pepohonan Bertingkat -->
+        <svg class="forest-scene-svg" viewBox="0 0 1440 560" preserveAspectRatio="xMidYMax slice">
+            <!-- LAYER 1: Perbukitan & Hutan Kabut Jauh -->
+            <g class="forest-layer-far" opacity="0.48">
+                <path d="M0 320 Q180 230 390 295 T810 270 T1210 290 T1440 250 L1440 560 L0 560 Z" fill="#74b494"/>
+                <!-- Puncak-puncak pohon jauh -->
+                <polygon points="70,310 92,235 114,310" fill="#63a685"/>
+                <polygon points="105,305 130,218 155,305" fill="#63a685"/>
+                <polygon points="240,295 262,222 284,295" fill="#63a685"/>
+                <polygon points="480,290 506,205 532,290" fill="#63a685"/>
+                <polygon points="520,295 542,228 564,295" fill="#63a685"/>
+                <polygon points="860,280 886,198 912,280" fill="#63a685"/>
+                <polygon points="900,285 922,220 944,285" fill="#63a685"/>
+                <polygon points="1160,292 1185,212 1210,292" fill="#63a685"/>
+                <polygon points="1310,275 1338,192 1366,275" fill="#63a685"/>
+            </g>
+
+            <!-- LAYER 2: Barisan Hutan Tengah (Pohon Pinus & Rimbun) -->
+            <g class="forest-layer-mid" opacity="0.72">
+                <path d="M0 385 Q240 330 490 375 T980 355 T1440 370 L1440 560 L0 560 Z" fill="#3b7a5e"/>
+
+                <!-- Pohon Pinus Kiri Tengah -->
+                <g fill="#357257">
+                    <polygon points="45,395 85,250 125,395"/>
+                    <polygon points="55,345 85,215 115,345"/>
+                    <polygon points="64,295 85,185 106,295"/>
+
+                    <polygon points="155,405 198,245 241,405"/>
+                    <polygon points="166,350 198,205 230,350"/>
+                    <polygon points="176,295 198,172 220,295"/>
+
+                    <polygon points="315,390 352,265 389,390"/>
+                    <polygon points="325,340 352,225 379,340"/>
+
+                    <!-- Pohon Rimbun Tengah -->
+                    <circle cx="470" cy="335" r="46"/>
+                    <circle cx="512" cy="322" r="54"/>
+                    <circle cx="555" cy="340" r="42"/>
+
+                    <polygon points="660,395 698,255 736,395"/>
+                    <polygon points="670,342 698,212 726,342"/>
+
+                    <circle cx="835" cy="330" r="50"/>
+                    <circle cx="882" cy="318" r="58"/>
+                    <circle cx="925" cy="336" r="45"/>
+
+                    <polygon points="1035,390 1078,240 1121,390"/>
+                    <polygon points="1048,335 1078,198 1108,335"/>
+                    <polygon points="1058,282 1078,165 1098,282"/>
+
+                    <polygon points="1220,395 1265,248 1310,395"/>
+                    <polygon points="1232,340 1265,205 1298,340"/>
+                    <polygon points="1244,285 1265,170 1286,285"/>
+                </g>
+            </g>
+
+            <!-- LAYER 3: Siluet Hutan Depan, Batang Pohon & Semak Pakis -->
+            <g class="forest-layer-front">
+                <!-- Tanah & Semak Bawah -->
+                <path d="M0 455 Q210 415 440 450 T940 438 T1440 448 L1440 560 L0 560 Z" fill="#1f513b"/>
+                <path d="M0 495 Q320 465 680 498 T1440 485 L1440 560 L0 560 Z" fill="#163c2b"/>
+
+                <!-- Batang & Tajuk Pohon Besar Bingkai Kiri -->
+                <rect x="26" y="130" width="24" height="430" rx="6" fill="#173e2d"/>
+                <path d="M38 250 L82 205 L75 215 L38 262 Z" fill="#173e2d"/>
+                <path d="M38 295 L-4 252 L2 262 L38 308 Z" fill="#173e2d"/>
+                <circle cx="38" cy="145" r="78" fill="#1f543d"/>
+                <circle cx="92" cy="175" r="58" fill="#256147"/>
+                <circle cx="-8" cy="180" r="62" fill="#1b4935"/>
+
+                <!-- Pohon Pinus Depan Kiri -->
+                <g fill="#1b4935">
+                    <polygon points="118,485 170,295 222,485"/>
+                    <polygon points="130,420 170,245 210,420"/>
+                    <polygon points="142,355 170,205 198,355"/>
+                </g>
+
+                <!-- Batang & Tajuk Pohon Besar Bingkai Kanan -->
+                <rect x="1384" y="115" width="28" height="445" rx="6" fill="#173e2d"/>
+                <path d="M1396 245 L1344 195 L1352 206 L1396 258 Z" fill="#173e2d"/>
+                <circle cx="1395" cy="135" r="84" fill="#1f543d"/>
+                <circle cx="1335" cy="168" r="62" fill="#256147"/>
+                <circle cx="1442" cy="172" r="64" fill="#1b4935"/>
+
+                <!-- Pohon Pinus Depan Kanan -->
+                <g fill="#1b4935">
+                    <polygon points="1235,485 1290,285 1345,485"/>
+                    <polygon points="1248,415 1290,235 1332,415"/>
+                    <polygon points="1260,350 1290,195 1320,350"/>
+                </g>
+
+                <!-- Rumpun Daun Pakis Hutan di Sepanjang Bawah -->
+                <g fill="#143627">
+                    <path d="M90 560 C85 515, 110 480, 145 462 C125 495, 115 525, 112 560 Z"/>
+                    <path d="M115 560 C130 518, 165 492, 205 485 C172 510, 150 532, 138 560 Z"/>
+                    <path d="M410 560 C405 522, 428 492, 460 478 C442 506, 432 532, 428 560 Z"/>
+                    <path d="M432 560 C448 525, 480 504, 515 498 C484 518, 464 538, 452 560 Z"/>
+                    <path d="M960 560 C955 520, 980 488, 1015 472 C995 502, 985 530, 980 560 Z"/>
+                    <path d="M985 560 C1002 522, 1035 498, 1072 492 C1040 514, 1018 536, 1005 560 Z"/>
+                    <path d="M1310 560 C1305 515, 1330 480, 1365 462 C1345 495, 1335 525, 1332 560 Z"/>
+                </g>
+            </g>
         </svg>
+
+        <!-- Kabut Bawah Menyatu dengan Dasar Hutan -->
+        <div class="forest-mist mist-lower"></div>
     </div>
 
     <div class="main-wrapper">
@@ -914,7 +1094,7 @@
                         <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
                         <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
                     </svg>
-                    <span>Eco-Telemetry • ESP32</span>
+                    <span>Forest Telemetry • ESP32</span>
                 </div>
 
                 <!-- Jam & Tanggal Real-Time -->
@@ -1182,7 +1362,6 @@
                 const gain = audioCtx.createGain();
 
                 if (variant === 'button') {
-                    // Suara pencet tombol: pop jernih naik
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(580, now);
                     osc.frequency.exponentialRampToValueAtTime(920, now + 0.065);
@@ -1194,7 +1373,6 @@
                     osc.start(now);
                     osc.stop(now + 0.09);
                 } else if (variant === 'card') {
-                    // Suara ketuk kartu / bar notifikasi: lembut & organik
                     osc.type = 'triangle';
                     osc.frequency.setValueAtTime(420, now);
                     osc.frequency.exponentialRampToValueAtTime(640, now + 0.075);
@@ -1206,7 +1384,6 @@
                     osc.start(now);
                     osc.stop(now + 0.1);
                 } else {
-                    // Suara tap ringan (pill / close)
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(740, now);
                     osc.frequency.exponentialRampToValueAtTime(480, now + 0.05);
@@ -1271,7 +1448,6 @@
 
                 const now = audioCtx.currentTime;
                 if (type === 'connected') {
-                    // Alarm Terhubung ESP32: 4 nada naik jernih
                     const notes = [523.25, 659.25, 783.99, 1046.50];
                     notes.forEach((freq, idx) => {
                         const osc = audioCtx.createOscillator();
@@ -1287,7 +1463,6 @@
                         osc.stop(now + idx * 0.11 + 0.25);
                     });
                 } else if (type === 'disconnected') {
-                    // Nada turun saat ESP32 terputus / mati
                     [440, 329.63].forEach((freq, idx) => {
                         const osc = audioCtx.createOscillator();
                         const gain = audioCtx.createGain();
@@ -1302,7 +1477,6 @@
                         osc.stop(now + idx * 0.16 + 0.3);
                     });
                 } else if (type === 'sensor-alert') {
-                    // Beep peringatan sensor (Suhu, Kelembapan, Gas)
                     [880, 880].forEach((freq, idx) => {
                         const osc = audioCtx.createOscillator();
                         const gain = audioCtx.createGain();
@@ -1376,7 +1550,6 @@
 
         // =========================================================================
         // MODUL A (TERPISAH): KONTROLER KONEKSI PERANGKAT ESP32
-        // Mendengarkan /ESP32_Status.json (/ESP32_Status/heartbeat dari ESP32)
         // =========================================================================
         const EspConnectionController = (() => {
             const INITIAL_CHECK_MS = 4500;
@@ -1504,8 +1677,6 @@
 
         // =========================================================================
         // MODUL B (TERPISAH): KONTROLER PEMBACAAN NILAI SENSOR
-        // Notifikasi hanya untuk DHT22 (Suhu & Kelembapan) dan MQ-2 (Gas/Asap).
-        // Sensor Ultrasonik (HC-SR04) tetap tampil di kartu gauge tanpa notifikasi.
         // =========================================================================
         const SensorMonitorController = (() => {
             const INITIAL_CHECK_MS = 4500;
