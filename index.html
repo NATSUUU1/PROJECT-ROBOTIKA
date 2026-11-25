@@ -1332,6 +1332,25 @@
         updateRealtimeClock();
         setInterval(updateRealtimeClock, 1000);
 
+        // Hemat CPU: hentikan animasi dekoratif hutan (sunbeam, godrays, mist,
+        // canopy, breeze layer) saat tab browser tidak sedang dilihat.
+        function toggleDecorAnimations(shouldRun) {
+            const state = shouldRun ? 'running' : 'paused';
+            document.querySelectorAll(
+                '.sunbeam-glow, .forest-godrays, .forest-mist, ' +
+                '.forest-layer-far, .forest-layer-mid, .forest-layer-front, ' +
+                '.canopy-top-left, .canopy-top-right, body'
+            ).forEach(el => {
+                el.style.animationPlayState = state;
+            });
+        }
+        document.addEventListener('visibilitychange', () => {
+            toggleDecorAnimations(!document.hidden);
+        });
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            toggleDecorAnimations(false);
+        }
+
         // ==========================================
         // SISTEM AUDIO & SOUND EFFECT SAAT DIPENCET
         // ==========================================
@@ -1440,8 +1459,17 @@
             }
         });
 
+        // Guard anti-tumpuk: cegah alarm diputar bertubi-tubi dalam waktu sangat singkat
+        let lastAlarmPlayedAt = 0;
+        const ALARM_MIN_GAP_MS = 400;
+
         function playAlarmSound(type = 'connected') {
             if (!alarmEnabled) return;
+
+            const nowMs = performance.now();
+            if (nowMs - lastAlarmPlayedAt < ALARM_MIN_GAP_MS) return; // tolak kalau terlalu rapat
+            lastAlarmPlayedAt = nowMs;
+
             try {
                 initAudioContext();
                 if (!audioCtx) return;
@@ -1620,13 +1648,20 @@
             }
 
             const statusStream = new EventSource(`${FIREBASE_URL}${ESP_STATUS_PATH}?auth=${FIREBASE_AUTH}`);
+            // Beri jeda toleransi singkat sebelum menandai terputus, karena EventSource
+            // sering melakukan reconnect otomatis dalam hitungan detik saat ada gangguan sesaat.
+            const ERROR_GRACE_MS = 3000;
+            let errorGraceTimer = null;
             statusStream.onopen = () => {
+                clearTimeout(errorGraceTimer);
                 if (!isSimulationActive && isConnected === null) {
                     kickWatchdog(INITIAL_CHECK_MS);
                 }
             };
             statusStream.onerror = () => {
-                if (!isSimulationActive) setState(false);
+                if (isSimulationActive) return;
+                clearTimeout(errorGraceTimer);
+                errorGraceTimer = setTimeout(() => setState(false), ERROR_GRACE_MS);
             };
 
             const onHeartbeatPacket = (event) => {
@@ -1790,6 +1825,18 @@
                 );
             }
 
+            // Batasi render maksimal 1x per animation frame, meski data SSE masuk
+            // beberapa kali berturut-turut dalam waktu yang sangat singkat.
+            let renderScheduled = false;
+            function scheduleProcessSensorReadings() {
+                if (renderScheduled) return;
+                renderScheduled = true;
+                requestAnimationFrame(() => {
+                    renderScheduled = false;
+                    processSensorReadings();
+                });
+            }
+
             function processSensorReadings() {
                 flashCards();
 
@@ -1948,7 +1995,7 @@
                     }
 
                     lastUpdateText.textContent = `Update Data: ${formatTime24(new Date())}`;
-                    processSensorReadings();
+                    scheduleProcessSensorReadings();
                     resetStaleTimer(SENSOR_STALE_MS);
                 } catch (err) {
                     console.error("Error parsing data sensor:", err);
