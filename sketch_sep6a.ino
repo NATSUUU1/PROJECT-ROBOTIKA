@@ -6,8 +6,8 @@
 #include <WiFiClientSecure.h>
 
 // ================= PENGATURAN WI-FI & FIREBASE =================
-const char* ssid = "Cah Ndeso";
-const char* password = "putuneeyangsuro131";
+const char* ssid = "Kjiwonn";
+const char* password = "geewonii28";
 
 // URL Firebase (TANPA https:// dan TANPA garis miring / di akhir)
 #define FIREBASE_HOST "rc-telementri-default-rtdb.asia-southeast1.firebasedatabase.app"
@@ -43,6 +43,11 @@ DHT dht(DHTPIN, DHTTYPE);
 #define IN2 26
 #define IN3 27
 #define IN4 14
+
+// Pin Enable L298N (WAJIB HIGH agar output motor aktif; sebelumnya pin ini
+// tidak pernah diatur di kode, sehingga motor diam meski IN1-IN4 benar)
+#define ENA 32  // enable motor kiri (pasangan IN1/IN2)
+#define ENB 33  // enable motor kanan (pasangan IN3/IN4)
 
 Servo radarServo;
 
@@ -292,9 +297,15 @@ void setup() {
   pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);
   pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT);
 
+  // Aktifkan enable L298N (full speed, tanpa PWM dulu).
+  // Tanpa ini, driver akan menahan output motor meskipun IN1-IN4 benar.
+  pinMode(ENA, OUTPUT); pinMode(ENB, OUTPUT);
+  digitalWrite(ENA, HIGH);
+  digitalWrite(ENB, HIGH);
+
   dht.begin();
   radarServo.setPeriodHertz(50);
-  radarServo.attach(SERVO_PIN, 500, 2400);
+  radarServo.attach(SERVO_PIN, 1000, 2000);
 
   // Pastikan motor dalam keadaan berhenti saat baru menyala
   motorBerhenti();
@@ -398,12 +409,12 @@ void loop() {
 
     servoAngle += SERVO_STEP_SIZE * servoDirection;
 
-    if (servoAngle >= 180) {
-      servoAngle = 180;
-      servoDirection = -1; // sampai di kanan, balik arah ke kiri
-    } else if (servoAngle <= 0) {
-      servoAngle = 0;
-      servoDirection = 1;  // sampai di kiri, balik arah ke kanan
+    if (servoAngle >= 175) {
+      servoAngle = 175;
+      servoDirection = -1; // sampai mendekati kanan, balik arah ke kiri (diberi margin 5 derajat agar tidak mentok mekanis)
+    } else if (servoAngle <= 5) {
+      servoAngle = 5;
+      servoDirection = 1;  // sampai mendekati kiri, balik arah ke kanan (diberi margin 5 derajat agar tidak mentok mekanis)
     }
 
     radarServo.write(servoAngle);
