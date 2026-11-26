@@ -1465,43 +1465,16 @@
             </section>
         </main>
 
-        <!-- PANEL PENGATUR KECEPATAN MOTOR KIRI DAN KANAN -->
+        <!-- PANEL KONTROL KECEPATAN KEDUA MOTOR BERSAMA -->
         <section class="motor-panel" aria-labelledby="motor-panel-title">
-            <div class="motor-panel-heading">
-                <div>
-                    <h2 id="motor-panel-title">Kontrol Kecepatan Motor</h2>
-                    <p>Atur PWM motor gearbox kiri dan kanan secara terpisah melalui ESP32 dan driver L298N.</p>
-                </div>
-                <span id="motor-connection" class="motor-connection">MENYIAPKAN KONTROL</span>
+            <div class="motor-panel-heading"><div><h2 id="motor-panel-title">Kontrol Kecepatan Kedua Motor</h2><p>Slider mengatur motor kiri dan kanan bersamaan (10–100%).</p></div><span id="motor-connection" class="motor-connection">MENYIAPKAN KONTROL</span></div>
+            <div class="motor-control-card">
+                <div class="motor-control-top"><label class="motor-name" for="motor-speed">Kecepatan Kedua Motor</label><output id="motor-value" class="motor-value" for="motor-speed">50%</output></div>
+                <input id="motor-speed" class="motor-range" type="range" min="10" max="100" step="1" value="50">
+                <div class="motor-scale"><span>10% • Pelan</span><span>100% • Maksimum</span></div><div class="motor-bar-track"><div id="motor-bar" class="motor-bar-fill" style="width:50%"></div></div>
             </div>
-
-            <div class="motor-controls-grid">
-                <div class="motor-control-card">
-                    <div class="motor-control-top">
-                        <label class="motor-name" for="motor-left-speed">Motor Kiri</label>
-                        <output id="motor-left-value" class="motor-value" for="motor-left-speed">0 / 255</output>
-                    </div>
-                    <input id="motor-left-speed" class="motor-range" type="range" min="0" max="255" step="1" value="0">
-                    <div class="motor-scale"><span>0 • Berhenti</span><span>255 • Maksimum</span></div>
-                    <div class="motor-bar-track"><div id="motor-left-bar" class="motor-bar-fill"></div></div>
-                </div>
-
-                <div class="motor-control-card">
-                    <div class="motor-control-top">
-                        <label class="motor-name" for="motor-right-speed">Motor Kanan</label>
-                        <output id="motor-right-value" class="motor-value" for="motor-right-speed">0 / 255</output>
-                    </div>
-                    <input id="motor-right-speed" class="motor-range" type="range" min="0" max="255" step="1" value="0">
-                    <div class="motor-scale"><span>0 • Berhenti</span><span>255 • Maksimum</span></div>
-                    <div class="motor-bar-track"><div id="motor-right-bar" class="motor-bar-fill"></div></div>
-                </div>
-            </div>
-
-            <div class="motor-actions">
-                <button id="motor-stop-button" class="motor-stop-button" type="button">STOP KEDUA MOTOR</button>
-                <span id="motor-command-status" class="motor-command-status" role="status">Menunggu koneksi Firebase...</span>
-            </div>
-            <p class="motor-note">Rentang PWM 0–255. Nilai 0 menghentikan motor. Slider hanya mengatur kecepatan; arah maju, mundur, dan belok tetap ditentukan oleh program navigasi/penghindar rintangan pada ESP32.</p>
+            <div class="motor-actions"><button id="motor-stop-button" class="motor-stop-button" type="button">STOP KEDUA MOTOR</button><button id="motor-run-button" type="button" class="motor-stop-button" style="background:#15803d">JALANKAN MOTOR</button><span id="motor-command-status" class="motor-command-status" role="status">Menunggu Firebase...</span></div>
+            <p class="motor-note">Kedua motor menerima nilai PWM yang sama. STOP menghentikan motor dan mengunci gerakan sampai tombol JALANKAN MOTOR ditekan. Arah tetap mengikuti navigasi penghindar rintangan.</p>
         </section>
     </div>
 
@@ -2237,104 +2210,29 @@
         })();
 
         // ==========================================
-        // KONTROL PWM MOTOR KIRI/KANAN MELALUI FIREBASE
-        // ==========================================
-        const motorLeftSlider = document.getElementById('motor-left-speed');
-        const motorRightSlider = document.getElementById('motor-right-speed');
-        const motorLeftValue = document.getElementById('motor-left-value');
-        const motorRightValue = document.getElementById('motor-right-value');
-        const motorLeftBar = document.getElementById('motor-left-bar');
-        const motorRightBar = document.getElementById('motor-right-bar');
+        // KONTROL KECEPATAN BERSAMA DUA MOTOR
+        const motorSlider = document.getElementById('motor-speed');
+        const motorValue = document.getElementById('motor-value');
+        const motorBar = document.getElementById('motor-bar');
         const motorConnection = document.getElementById('motor-connection');
         const motorCommandStatus = document.getElementById('motor-command-status');
         const motorStopButton = document.getElementById('motor-stop-button');
-        let motorDebounceTimer = null;
-
-        function renderMotorSlider(side, value) {
-            const pwm = Math.max(0, Math.min(255, Number(value) || 0));
-            if (side === 'left') {
-                motorLeftSlider.value = String(pwm);
-                motorLeftValue.textContent = `${pwm} / 255`;
-                motorLeftBar.style.width = `${(pwm / 255) * 100}%`;
-            } else {
-                motorRightSlider.value = String(pwm);
-                motorRightValue.textContent = `${pwm} / 255`;
-                motorRightBar.style.width = `${(pwm / 255) * 100}%`;
-            }
+        const motorRunButton = document.getElementById('motor-run-button');
+        let motorStop = true; let motorDebounceTimer = null;
+        function renderMotor(pct){ pct=Math.max(10,Math.min(100,Number(pct)||10)); motorSlider.value=pct; motorValue.textContent=pct+'%'; motorBar.style.width=pct+'%'; }
+        function setMotorState(connected,msg){motorConnection.textContent=msg;motorConnection.classList.toggle('error',!connected);}
+        async function motorWrite(data){
+          motorCommandStatus.textContent='Mengirim perintah...';
+          try{const r=await fetch(`${FIREBASE_URL}/Motor.json?auth=${encodeURIComponent(FIREBASE_AUTH)}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});if(!r.ok)throw new Error('HTTP '+r.status);setMotorState(true,'FIREBASE SIAP');motorCommandStatus.textContent=data.Stop?'Motor dihentikan (STOP)':'Kecepatan '+data.SpeedPercent+'% terkirim ke kedua motor';}
+          catch(e){setMotorState(false,'GAGAL TERKIRIM');motorCommandStatus.textContent='Gagal mengirim. Periksa Firebase/token.';console.error(e);}
         }
-
-        function setMotorConnectionState(connected, message) {
-            motorConnection.textContent = message;
-            motorConnection.classList.toggle('error', !connected);
-        }
-
-        async function loadMotorSettings() {
-            try {
-                const response = await fetch(`${FIREBASE_URL}${MOTOR_PATH}?auth=${encodeURIComponent(FIREBASE_AUTH)}`, {
-                    method: 'GET',
-                    cache: 'no-store'
-                });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
-                if (data && typeof data === 'object') {
-                    if (Number.isFinite(Number(data.SpeedKiri))) renderMotorSlider('left', data.SpeedKiri);
-                    if (Number.isFinite(Number(data.SpeedKanan))) renderMotorSlider('right', data.SpeedKanan);
-                }
-                setMotorConnectionState(true, 'FIREBASE SIAP');
-                motorCommandStatus.textContent = 'Pengaturan motor siap. Geser slider untuk mengirim PWM.';
-            } catch (error) {
-                setMotorConnectionState(false, 'FIREBASE GAGAL');
-                motorCommandStatus.textContent = 'Gagal membaca Firebase. Periksa URL, token, dan Rules database.';
-                console.error('Gagal memuat pengaturan motor:', error);
-            }
-        }
-
-        async function sendMotorSettings() {
-            const kiri = Number(motorLeftSlider.value);
-            const kanan = Number(motorRightSlider.value);
-            motorCommandStatus.textContent = 'Mengirim perintah ke Firebase...';
-            try {
-                const response = await fetch(`${FIREBASE_URL}${MOTOR_PATH}?auth=${encodeURIComponent(FIREBASE_AUTH)}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ SpeedKiri: kiri, SpeedKanan: kanan })
-                });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                setMotorConnectionState(true, 'PERINTAH TERKIRIM');
-                motorCommandStatus.textContent = `Perintah tersimpan • Kiri ${kiri} | Kanan ${kanan}`;
-            } catch (error) {
-                setMotorConnectionState(false, 'GAGAL TERKIRIM');
-                motorCommandStatus.textContent = 'Perintah gagal dikirim. Periksa koneksi/token Firebase.';
-                console.error('Gagal mengirim PWM motor:', error);
-            }
-        }
-
-        function queueMotorSettings() {
-            renderMotorSlider('left', motorLeftSlider.value);
-            renderMotorSlider('right', motorRightSlider.value);
-            motorCommandStatus.textContent = 'Menunggu pengiriman perubahan...';
-            clearTimeout(motorDebounceTimer);
-            motorDebounceTimer = setTimeout(sendMotorSettings, 180);
-        }
-
-        function stopAllMotors() {
-            motorLeftSlider.value = '0';
-            motorRightSlider.value = '0';
-            renderMotorSlider('left', 0);
-            renderMotorSlider('right', 0);
-            clearTimeout(motorDebounceTimer);
-            sendMotorSettings();
-        }
-
-        motorLeftSlider.addEventListener('input', queueMotorSettings);
-        motorRightSlider.addEventListener('input', queueMotorSettings);
-        motorStopButton.addEventListener('click', () => {
-            playPressSfx('button');
-            stopAllMotors();
-        });
+        async function loadMotorSettings(){try{const r=await fetch(`${FIREBASE_URL}/Motor.json?auth=${encodeURIComponent(FIREBASE_AUTH)}`,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();if(d){renderMotor(d.SpeedPercent||50);motorStop=d.Stop!==false;}setMotorState(true,'FIREBASE SIAP');motorCommandStatus.textContent=motorStop?'Motor dalam keadaan STOP':'Kontrol motor tersambung';}catch(e){setMotorState(false,'FIREBASE GAGAL');motorCommandStatus.textContent='Periksa koneksi Firebase';}}
+        function queueMotorSettings(){renderMotor(motorSlider.value);clearTimeout(motorDebounceTimer);motorDebounceTimer=setTimeout(()=>motorWrite({SpeedPercent:Number(motorSlider.value),Stop:false}),200);motorStop=false;}
+        motorSlider.addEventListener('input',queueMotorSettings);
+        motorStopButton.addEventListener('click',()=>{clearTimeout(motorDebounceTimer);motorStop=true;motorWrite({Stop:true,SpeedPercent:Number(motorSlider.value)});});
+        motorRunButton.addEventListener('click',()=>{motorStop=false;motorWrite({Stop:false,SpeedPercent:Number(motorSlider.value)});});
         loadMotorSettings();
 
-        // ==========================================
         // MODE SIMULASI (MENGUJI THRESHOLD ARDUINO)
         // ==========================================
         function toggleSimulation() {
