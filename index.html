@@ -1103,6 +1103,96 @@
             min-height: 20px;
         }
 
+        .motor-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .motor-toggle-label {
+            color: var(--leaf-deep);
+            font-weight: 800;
+            font-size: 0.98rem;
+        }
+
+        .motor-toggle-sub {
+            margin: 3px 0 0;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+        }
+
+        .motor-switch {
+            position: relative;
+            display: inline-block;
+            width: 64px;
+            height: 36px;
+            flex-shrink: 0;
+        }
+
+        .motor-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .motor-switch-track {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: #b91c1c;
+            border-radius: 999px;
+            transition: background 0.22s ease;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.12);
+        }
+
+        .motor-switch-track::before {
+            content: '';
+            position: absolute;
+            height: 28px;
+            width: 28px;
+            left: 4px;
+            top: 4px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.22s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+        }
+
+        .motor-switch input:checked + .motor-switch-track {
+            background: #15803d;
+        }
+
+        .motor-switch input:checked + .motor-switch-track::before {
+            transform: translateX(28px);
+        }
+
+        .motor-switch input:focus-visible + .motor-switch-track {
+            outline: 3px solid rgba(45, 106, 79, 0.4);
+            outline-offset: 2px;
+        }
+
+        .motor-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 10px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+
+        .motor-status-pill.on {
+            background: #d8f3dc;
+            color: #1b4332;
+        }
+
+        .motor-status-pill.off {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
         .motor-note {
             margin: 14px 0 0;
             color: var(--text-muted);
@@ -1465,16 +1555,24 @@
             </section>
         </main>
 
-        <!-- PANEL KONTROL KECEPATAN KEDUA MOTOR BERSAMA -->
+        <!-- PANEL ON/OFF DRIVER MOTOR GEARBOX -->
         <section class="motor-panel" aria-labelledby="motor-panel-title">
-            <div class="motor-panel-heading"><div><h2 id="motor-panel-title">Kontrol Kecepatan Kedua Motor</h2><p>Slider mengatur motor kiri dan kanan bersamaan (10–100%).</p></div><span id="motor-connection" class="motor-connection">MENYIAPKAN KONTROL</span></div>
+            <div class="motor-panel-heading"><div><h2 id="motor-panel-title">Saklar Driver Motor</h2><p>Nyalakan atau matikan driver motor gearbox dari jarak jauh.</p></div><span id="motor-connection" class="motor-connection">MENYIAPKAN KONTROL</span></div>
             <div class="motor-control-card">
-                <div class="motor-control-top"><label class="motor-name" for="motor-speed">Kecepatan Kedua Motor</label><output id="motor-value" class="motor-value" for="motor-speed">50%</output></div>
-                <input id="motor-speed" class="motor-range" type="range" min="10" max="100" step="1" value="50">
-                <div class="motor-scale"><span>10% • Pelan</span><span>100% • Maksimum</span></div><div class="motor-bar-track"><div id="motor-bar" class="motor-bar-fill" style="width:50%"></div></div>
+                <div class="motor-toggle-row">
+                    <div>
+                        <div class="motor-toggle-label">Driver Motor Gearbox</div>
+                        <p class="motor-toggle-sub">ON = robot jalan otomatis &amp; menghindari halangan sendiri. OFF = motor dikunci diam.</p>
+                        <span id="motor-status-pill" class="motor-status-pill off">● MATI</span>
+                    </div>
+                    <label class="motor-switch">
+                        <input type="checkbox" id="motor-toggle">
+                        <span class="motor-switch-track"></span>
+                    </label>
+                </div>
             </div>
-            <div class="motor-actions"><button id="motor-stop-button" class="motor-stop-button" type="button">STOP KEDUA MOTOR</button><button id="motor-run-button" type="button" class="motor-stop-button" style="background:#15803d">JALANKAN MOTOR</button><span id="motor-command-status" class="motor-command-status" role="status">Menunggu Firebase...</span></div>
-            <p class="motor-note">Kedua motor menerima nilai PWM yang sama. STOP menghentikan motor dan mengunci gerakan sampai tombol JALANKAN MOTOR ditekan. Arah tetap mengikuti navigasi penghindar rintangan.</p>
+            <div class="motor-actions"><span id="motor-command-status" class="motor-command-status" role="status">Menunggu Firebase...</span></div>
+            <p class="motor-note">Saat ON, motor berjalan penuh (tanpa pengaturan kecepatan/PWM) dan otomatis mundur-belok sendiri lewat ultrasonic ketika mendeteksi tembok/halangan. Saat OFF, kedua motor benar-benar berhenti sampai dinyalakan lagi di sini.</p>
         </section>
     </div>
 
@@ -2210,27 +2308,60 @@
         })();
 
         // ==========================================
-        // KONTROL KECEPATAN BERSAMA DUA MOTOR
-        const motorSlider = document.getElementById('motor-speed');
-        const motorValue = document.getElementById('motor-value');
-        const motorBar = document.getElementById('motor-bar');
+        // SAKLAR ON/OFF DRIVER MOTOR GEARBOX (tanpa PWM, sesuai firmware terbaru)
+        const motorToggle = document.getElementById('motor-toggle');
         const motorConnection = document.getElementById('motor-connection');
         const motorCommandStatus = document.getElementById('motor-command-status');
-        const motorStopButton = document.getElementById('motor-stop-button');
-        const motorRunButton = document.getElementById('motor-run-button');
-        let motorStop = true; let motorDebounceTimer = null;
-        function renderMotor(pct){ pct=Math.max(10,Math.min(100,Number(pct)||10)); motorSlider.value=pct; motorValue.textContent=pct+'%'; motorBar.style.width=pct+'%'; }
-        function setMotorState(connected,msg){motorConnection.textContent=msg;motorConnection.classList.toggle('error',!connected);}
-        async function motorWrite(data){
-          motorCommandStatus.textContent='Mengirim perintah...';
-          try{const r=await fetch(`${FIREBASE_URL}/Motor.json?auth=${encodeURIComponent(FIREBASE_AUTH)}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});if(!r.ok)throw new Error('HTTP '+r.status);setMotorState(true,'FIREBASE SIAP');motorCommandStatus.textContent=data.Stop?'Motor dihentikan (STOP)':'Kecepatan '+data.SpeedPercent+'% terkirim ke kedua motor';}
-          catch(e){setMotorState(false,'GAGAL TERKIRIM');motorCommandStatus.textContent='Gagal mengirim. Periksa Firebase/token.';console.error(e);}
+        const motorStatusPill = document.getElementById('motor-status-pill');
+        let motorStop = true;
+
+        function renderMotorPill(isOn){
+            motorStatusPill.textContent = isOn ? '● MENYALA' : '● MATI';
+            motorStatusPill.className = 'motor-status-pill ' + (isOn ? 'on' : 'off');
         }
-        async function loadMotorSettings(){try{const r=await fetch(`${FIREBASE_URL}/Motor.json?auth=${encodeURIComponent(FIREBASE_AUTH)}`,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();if(d){renderMotor(d.SpeedPercent||50);motorStop=d.Stop!==false;}setMotorState(true,'FIREBASE SIAP');motorCommandStatus.textContent=motorStop?'Motor dalam keadaan STOP':'Kontrol motor tersambung';}catch(e){setMotorState(false,'FIREBASE GAGAL');motorCommandStatus.textContent='Periksa koneksi Firebase';}}
-        function queueMotorSettings(){renderMotor(motorSlider.value);clearTimeout(motorDebounceTimer);motorDebounceTimer=setTimeout(()=>motorWrite({SpeedPercent:Number(motorSlider.value),Stop:false}),200);motorStop=false;}
-        motorSlider.addEventListener('input',queueMotorSettings);
-        motorStopButton.addEventListener('click',()=>{clearTimeout(motorDebounceTimer);motorStop=true;motorWrite({Stop:true,SpeedPercent:Number(motorSlider.value)});});
-        motorRunButton.addEventListener('click',()=>{motorStop=false;motorWrite({Stop:false,SpeedPercent:Number(motorSlider.value)});});
+        function setMotorState(connected, msg){ motorConnection.textContent = msg; motorConnection.classList.toggle('error', !connected); }
+
+        async function motorWrite(data){
+            motorCommandStatus.textContent = 'Mengirim perintah...';
+            try {
+                const r = await fetch(`${FIREBASE_URL}/Motor.json?auth=${encodeURIComponent(FIREBASE_AUTH)}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                setMotorState(true, 'FIREBASE SIAP');
+                motorCommandStatus.textContent = data.Stop ? 'Driver motor dimatikan' : 'Driver motor dinyalakan, robot jalan otomatis';
+            } catch (e) {
+                setMotorState(false, 'GAGAL TERKIRIM');
+                motorCommandStatus.textContent = 'Gagal mengirim. Periksa Firebase/token.';
+                console.error(e);
+            }
+        }
+
+        async function loadMotorSettings(){
+            try {
+                const r = await fetch(`${FIREBASE_URL}/Motor.json?auth=${encodeURIComponent(FIREBASE_AUTH)}`, { cache: 'no-store' });
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                const d = await r.json();
+                motorStop = d ? (d.Stop !== false) : true;
+                motorToggle.checked = !motorStop;
+                renderMotorPill(!motorStop);
+                setMotorState(true, 'FIREBASE SIAP');
+                motorCommandStatus.textContent = motorStop ? 'Driver motor dalam keadaan MATI' : 'Driver motor sedang MENYALA';
+            } catch (e) {
+                setMotorState(false, 'FIREBASE GAGAL');
+                motorCommandStatus.textContent = 'Periksa koneksi Firebase';
+            }
+        }
+
+        motorToggle.addEventListener('change', () => {
+            const nyala = motorToggle.checked;
+            motorStop = !nyala;
+            renderMotorPill(nyala);
+            motorWrite({ Stop: !nyala });
+        });
+
         loadMotorSettings();
 
         // MODE SIMULASI (MENGUJI THRESHOLD ARDUINO)
